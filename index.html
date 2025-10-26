@@ -54,24 +54,16 @@
   <h3>取得したHTML</h3>
   <textarea id="output" placeholder="ここにHTMLが表示されます..."></textarea>
 
-  <h3>抽出結果（メインデッキ）</h3>
-  <table id="mainDeck">
+  <h3>抽出結果（output2：メインデッキ）</h3>
+  <table id="output2">
     <thead>
       <tr><th>カードID</th><th>カード名</th><th>点数</th></tr>
     </thead>
     <tbody></tbody>
   </table>
 
-  <h3>抽出結果（エクストラデッキ）</h3>
-  <table id="extraDeck">
-    <thead>
-      <tr><th>カードID</th><th>カード名</th><th>点数</th></tr>
-    </thead>
-    <tbody></tbody>
-  </table>
-
-  <h3>抽出結果（サイドデッキ）</h3>
-  <table id="sideDeck">
+  <h3>抽出結果（output3：サイドデッキ）</h3>
+  <table id="output3">
     <thead>
       <tr><th>カードID</th><th>カード名</th><th>点数</th></tr>
     </thead>
@@ -82,12 +74,10 @@
     document.getElementById('fetchBtn').addEventListener('click', async () => {
       const targetUrl = document.getElementById('urlInput').value.trim();
       const output = document.getElementById('output');
-      const tbodyMain = document.querySelector('#mainDeck tbody');
-      const tbodyExtra = document.querySelector('#extraDeck tbody');
-      const tbodySide = document.querySelector('#sideDeck tbody');
+      const tbodyMain = document.querySelector('#output2 tbody');
+      const tbodySide = document.querySelector('#output3 tbody');
       output.value = '';
       tbodyMain.innerHTML = '';
-      tbodyExtra.innerHTML = '';
       tbodySide.innerHTML = '';
 
       if (!targetUrl) {
@@ -113,16 +103,55 @@
       try {
         const res = await fetch(proxyUrl);
         if (!res.ok) throw new Error(`ステータスコード: ${res.status}`);
+
         const data = await res.json();
         const html = data.contents;
         output.value = html;
 
-        // 共通抽出関数
-        function extractDeck(htmlSection, tbody, showTotal = true) {
-          const rowBlocks = [...htmlSection.matchAll(/<tr class='[^']* row' title="([^"]+)">([\s\S]*?)<\/tr>/g)];
-          let totalScore = 0;
+        // メインデッキ抽出
+        const cidMatches = [...html.matchAll(/cid=(\d+)/g)];
+        const nameMatches = [...html.matchAll(/ja"\s+title="([^"]+)"\s+class="none"/g)];
 
-          for (const block of rowBlocks) {
+        const cidList = cidMatches.map(m => m[1]);
+        const nameList = nameMatches.map(m => m[1]);
+
+        let totalScore = 0;
+        const count = Math.min(cidList.length, nameList.length);
+        for (let i = 0; i < count; i++) {
+          const rawName = nameList[i];
+          const cleanName = rawName.replace(/【(禁止|制限|準制限)カード】/g, '').trim();
+          const cid = cidList[i];
+          const score = cardMap[cid]?.score ?? 0;
+          totalScore += score;
+
+          const row = document.createElement('tr');
+          row.innerHTML = `<td>${cid}</td><td>${cleanName}</td><td>${score}</td>`;
+          tbodyMain.appendChild(row);
+        }
+
+        if (count === 0) {
+          const row = document.createElement('tr');
+          row.innerHTML = `<td colspan="3">抽出できるデータが見つかりませんでした。</td>`;
+          tbodyMain.appendChild(row);
+        } else {
+          const totalRow = document.createElement('tr');
+          totalRow.innerHTML = `<td colspan="3"><strong>合計点数: ${totalScore}</strong></td>`;
+          tbodyMain.appendChild(totalRow);
+
+          if (totalScore > 100) {
+            const warnRow = document.createElement('tr');
+            warnRow.innerHTML = `<td colspan="3" class="warning">※メインデッキの点数が100を超えています！</td>`;
+            tbodyMain.appendChild(warnRow);
+          }
+        }
+
+        // サイドデッキ抽出
+        const sideMatch = html.match(/<div id="side" class="card_set">([\s\S]*?)<\/div>/);
+        if (sideMatch) {
+          const sideHtml = sideMatch[1];
+          const sideRows = [...sideHtml.matchAll(/<tr class='[^']* row' title="([^"]+)">([\s\S]*?)<\/tr>/g)];
+
+          for (const block of sideRows) {
             let cardName = block[1];
             const inner = block[2];
 
@@ -136,25 +165,18 @@
               const score = cardMap[cid]?.score ?? 0;
 
               for (let i = 0; i < count; i++) {
-                totalScore += score;
                 const row = document.createElement('tr');
                 row.innerHTML = `<td>${cid}</td><td>${cardName}</td><td>${score}</td>`;
-                tbody.appendChild(row);
+                tbodySide.appendChild(row);
               }
             }
           }
-
-          if (showTotal) {
-            const totalRow = document.createElement('tr');
-            totalRow.innerHTML = `<td colspan="3"><strong>合計点数: ${totalScore}</strong></td>`;
-            tbody.appendChild(totalRow);
-
-            if (totalScore > 100) {
-              const warnRow = document.createElement('tr');
-              warnRow.innerHTML = `<td colspan="3" class="warning">※このデッキの点数が100を超えています！</td>`;
-              tbody.appendChild(warnRow);
-            }
-          }
         }
-
-        // メ
+      } catch (err) {
+        alert('HTMLの取得に失敗しました。CORS制限やURLの形式を確認してください。');
+        console.error('取得エラー:', err);
+      }
+    });
+  </script>
+</body>
+</html>
