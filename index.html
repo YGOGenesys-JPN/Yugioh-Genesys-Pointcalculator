@@ -74,6 +74,7 @@
     <p>サイドデッキは現在(2025/11)未対応です。今後対応するかもしれません。</p>
     <p>リンクモンスター、ペンデュラムモンスターについてはデッキレシピに含まれていた場合でも</p>
     <p>当ツールでは取得できません。各自でのチェックをお願いします。</p>
+    <p></p>
     <p><a href="scorelist.html" target="_blank">点数表はこちら</a></p>
   </div>
 
@@ -133,7 +134,7 @@
         if (!cardRes.ok) throw new Error('cards.jsonの読み込みに失敗しました');
         cardMap = await cardRes.json();
       } catch (err) {
-        alert('cards.jsonの読み込みに失敗しました。ローカルサーバーで開いていますか？');
+        alert('cards.jsonの読み込みに失敗しました。');
         console.error(err);
         loadingDiv.textContent = '';
         return;
@@ -183,7 +184,7 @@
 
           if (totalScore > 100) {
             const warnRow = document.createElement('tr');
-            warnRow.innerHTML = `<td colspan="3" class="warning">※このデッキの点数が100を超えています！</td>`;
+            warnRow.innerHTML = `<td colspan="3" class="warning">※デッキの点数が100を超えています！</td>`;
             tbody.appendChild(warnRow);
           }
         }
