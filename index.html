@@ -45,15 +45,21 @@
       margin-bottom: 1em;
       font-weight: bold;
     }
+    #comments {
+      margin-top: 4em;
+      padding: 2em;
+      background: #f0f0f0;
+      border: 1px dashed #aaa;
+      min-height: 100px;
+    }
   </style>
 </head>
 <body>
-  <h2>取得したいURLを入力してください</h2>
+  <h2>遊戯王Genesys 点数計算ツール 2025/09/25版</h2>
 
   <div id="usage">
     <h3>使い方</h3>
-    <p>このツールでは、遊戯王デッキのURLを入力して「表示」ボタンを押すことで、デッキ内のカード点数と合計点数を確認できます。</p>
-    <p>点数は <code>cards.json</code> に基づいて計算されます。</p>
+    <p>遊戯王DBのデッキURLを入力し「URLからデッキの点数を表示」ボタンを押すことで、デッキ内のカード点数と合計点数を表示できます。</p>
     <p><a href="scorelist.html" target="_blank">点数表はこちら</a></p>
   </div>
 
@@ -72,6 +78,10 @@
     </thead>
     <tbody></tbody>
   </table>
+
+  <div id="comments">
+    <!-- コメントスペース -->
+  </div>
 
   <script>
     document.getElementById('fetchBtn').addEventListener('click', async () => {
