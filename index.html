@@ -41,6 +41,10 @@
       border: 1px solid #ccc;
       margin-bottom: 2em;
     }
+    #loadingMessage {
+      margin-bottom: 1em;
+      font-weight: bold;
+    }
   </style>
 </head>
 <body>
@@ -49,11 +53,13 @@
   <div id="usage">
     <h3>使い方</h3>
     <p>このツールでは、遊戯王デッキのURLを入力して「表示」ボタンを押すことで、デッキ内のカード点数と合計点数を確認できます。</p>
+    <p>点数は <code>cards.json</code> に基づいて計算されます。</p>
     <p><a href="scorelist.html" target="_blank">点数表はこちら</a></p>
   </div>
 
   <input type="text" id="urlInput" placeholder="https://example.com" />
   <button id="fetchBtn">URLからデッキの点数を表示</button>
+  <div id="loadingMessage"></div>
 
   <h3>デッキ合計点数</h3>
   <table id="mainDeck">
@@ -71,10 +77,13 @@
     document.getElementById('fetchBtn').addEventListener('click', async () => {
       let targetUrl = document.getElementById('urlInput').value.trim();
       const tbodyMain = document.querySelector('#mainDeck tbody');
+      const loadingDiv = document.getElementById('loadingMessage');
       tbodyMain.innerHTML = '';
+      loadingDiv.textContent = 'デッキ情報を取得しています…';
 
       if (!targetUrl) {
         alert('URLを入力してください');
+        loadingDiv.textContent = '';
         return;
       }
 
@@ -88,6 +97,7 @@
           targetUrl = `https://www.db.yugioh-card.com/yugiohdb/member_deck.action?cgid=${cgid}&dno=${dno}&request_locale=ja`;
         } else {
           alert('cgid または dno が見つかりません。URLを確認してください。');
+          loadingDiv.textContent = '';
           return;
         }
       }
@@ -101,6 +111,7 @@
       } catch (err) {
         alert('cards.jsonの読み込みに失敗しました。ローカルサーバーで開いていますか？');
         console.error(err);
+        loadingDiv.textContent = '';
         return;
       }
 
@@ -155,12 +166,12 @@
           }
         }
 
-        // メインデッキ抽出（全体HTMLから）
         extractDeck(html, tbodyMain);
-
+        loadingDiv.textContent = '';
       } catch (err) {
         alert('HTMLの取得に失敗しました。CORS制限やURLの形式を確認してください。');
         console.error('取得エラー:', err);
+        loadingDiv.textContent = '';
       }
     });
   </script>
