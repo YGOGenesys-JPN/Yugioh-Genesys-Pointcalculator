@@ -49,7 +49,6 @@
   <div id="usage">
     <h3>使い方</h3>
     <p>このツールでは、遊戯王デッキのURLを入力して「表示」ボタンを押すことで、デッキ内のカード点数と合計点数を確認できます。</p>
-    <p>点数は <code>cards.json</code> に基づいて計算されます。</p>
     <p><a href="scorelist.html" target="_blank">点数表はこちら</a></p>
   </div>
 
@@ -70,7 +69,7 @@
 
   <script>
     document.getElementById('fetchBtn').addEventListener('click', async () => {
-      const targetUrl = document.getElementById('urlInput').value.trim();
+      let targetUrl = document.getElementById('urlInput').value.trim();
       const tbodyMain = document.querySelector('#mainDeck tbody');
       tbodyMain.innerHTML = '';
 
@@ -79,6 +78,21 @@
         return;
       }
 
+      // URLを②形式に変換（ytkn/ope/wnameが含まれていたら）
+      if (/ytkn=|ope=|wname=/.test(targetUrl)) {
+        const cgidMatch = targetUrl.match(/cgid=([a-zA-Z0-9]+)/);
+        const dnoMatch = targetUrl.match(/dno=(\d+)/);
+        if (cgidMatch && dnoMatch) {
+          const cgid = cgidMatch[1];
+          const dno = dnoMatch[1];
+          targetUrl = `https://www.db.yugioh-card.com/yugiohdb/member_deck.action?cgid=${cgid}&dno=${dno}&request_locale=ja`;
+        } else {
+          alert('cgid または dno が見つかりません。URLを確認してください。');
+          return;
+        }
+      }
+
+      // cards.json を読み込む
       let cardMap = {};
       try {
         const cardRes = await fetch('cards.json');
@@ -90,6 +104,7 @@
         return;
       }
 
+      // HTMLを取得（CORS回避）
       const proxyUrl = "https://api.allorigins.win/get?url=" + encodeURIComponent(targetUrl);
 
       try {
@@ -98,6 +113,7 @@
         const data = await res.json();
         const html = data.contents;
 
+        // デッキ抽出関数
         function extractDeck(htmlSection, tbody) {
           const rowBlocks = [...htmlSection.matchAll(/<tr class='[^']* row' title="([^"]+)">([\s\S]*?)<\/tr>/g)];
           let totalScore = 0;
@@ -139,6 +155,7 @@
           }
         }
 
+        // メインデッキ抽出（全体HTMLから）
         extractDeck(html, tbodyMain);
 
       } catch (err) {
