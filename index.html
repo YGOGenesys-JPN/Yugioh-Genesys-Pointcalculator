@@ -35,13 +35,6 @@
       color: red;
       font-weight: bold;
     }
-    #totals {
-      font-size: 16px;
-      margin-top: 2em;
-      background: #fff;
-      padding: 1em;
-      border: 1px solid #ccc;
-    }
   </style>
 </head>
 <body>
@@ -73,34 +66,32 @@
     <tbody></tbody>
   </table>
 
-  <div id="totals"></div>
-
   <script>
     document.getElementById('fetchBtn').addEventListener('click', async () => {
       const targetUrl = document.getElementById('urlInput').value.trim();
       const tbodyMain = document.querySelector('#mainDeck tbody');
       const tbodyExtra = document.querySelector('#extraDeck tbody');
-      const totalsDiv = document.getElementById('totals');
       tbodyMain.innerHTML = '';
       tbodyExtra.innerHTML = '';
-      totalsDiv.innerHTML = '';
 
       if (!targetUrl) {
         alert('URLを入力してください');
         return;
       }
 
+      // cards.json を読み込む
       let cardMap = {};
       try {
         const cardRes = await fetch('cards.json');
         if (!cardRes.ok) throw new Error('cards.jsonの読み込みに失敗しました');
         cardMap = await cardRes.json();
       } catch (err) {
-        alert('cards.jsonの読み込みに失敗しました。');
+        alert('cards.jsonの読み込みに失敗しました。ローカルサーバーで開いていますか？');
         console.error(err);
         return;
       }
 
+      // HTMLを取得（CORS回避）
       const proxyUrl = "https://api.allorigins.win/get?url=" + encodeURIComponent(targetUrl);
 
       try {
@@ -109,6 +100,7 @@
         const data = await res.json();
         const html = data.contents;
 
+        // 共通抽出関数
         function extractDeck(htmlSection, tbody) {
           const rowBlocks = [...htmlSection.matchAll(/<tr class='[^']* row' title="([^"]+)">([\s\S]*?)<\/tr>/g)];
           let totalScore = 0;
@@ -117,8 +109,8 @@
             let cardName = block[1];
             const inner = block[2];
 
-            const cidMatch = inner.match(/value="[^"]*cid=(\d+)&?/);
-            const countMatch = inner.match(/<td class="num">\s*<span>\s*(\d+)\s*<\/span>/);
+            const cidMatch = inner.match(/value="[^"]*cid=(\d+)&/);
+            const countMatch = inner.match(/<td class="num">\s*<span>(\d+)<\/span>/);
 
             if (cidMatch && countMatch) {
               const cid = cidMatch[1];
@@ -139,24 +131,25 @@
             }
           }
 
-          return totalScore;
+          const totalRow = document.createElement('tr');
+          totalRow.innerHTML = `<td colspan="3"><strong>合計点数: ${totalScore}</strong></td>`;
+          tbody.appendChild(totalRow);
+
+          if (totalScore > 100) {
+            const warnRow = document.createElement('tr');
+            warnRow.innerHTML = `<td colspan="3" class="warning">※このデッキの点数が100を超えています！</td>`;
+            tbody.appendChild(warnRow);
+          }
         }
 
-        const mainScore = extractDeck(html, tbodyMain);
+        // メインデッキ抽出（全体HTMLから）
+        extractDeck(html, tbodyMain);
 
+        // エクストラデッキ抽出（extra_list テーブルのみ）
         const extraTableMatch = html.match(/<table id="extra_list" class="deck_list">([\s\S]*?)<\/table>/);
-        let extraScore = 0;
         if (extraTableMatch) {
-          extraScore = extractDeck(extraTableMatch[1], tbodyExtra);
+          extractDeck(extraTableMatch[1], tbodyExtra);
         }
-
-        // 合計点数表示
-        totalsDiv.innerHTML = `
-          <p><strong>メインデッキ合計点数:</strong> ${mainScore}</p>
-          ${mainScore > 100 ? '<p class="warning">※メインデッキの点数が100を超えています！</p>' : ''}
-          <p><strong>エクストラデッキ合計点数:</strong> ${extraScore}</p>
-          ${extraScore > 100 ? '<p class="warning">※エクストラデッキの点数が100を超えています！</p>' : ''}
-        `;
 
       } catch (err) {
         alert('HTMLの取得に失敗しました。CORS制限やURLの形式を確認してください。');
@@ -166,4 +159,3 @@
   </script>
 </body>
 </html>
- 
