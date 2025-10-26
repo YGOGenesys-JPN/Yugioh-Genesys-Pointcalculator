@@ -35,6 +35,13 @@
       color: red;
       font-weight: bold;
     }
+    #totals {
+      font-size: 16px;
+      margin-top: 2em;
+      background: #fff;
+      padding: 1em;
+      border: 1px solid #ccc;
+    }
   </style>
 </head>
 <body>
@@ -66,27 +73,17 @@
     <tbody></tbody>
   </table>
 
-  <h3>サイドデッキ</h3>
-  <table id="sideDeck">
-    <thead>
-      <tr>
-        <th style="display:none">CID</th>
-        <th>カード名</th>
-        <th>点数</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
+  <div id="totals"></div>
 
   <script>
     document.getElementById('fetchBtn').addEventListener('click', async () => {
       const targetUrl = document.getElementById('urlInput').value.trim();
       const tbodyMain = document.querySelector('#mainDeck tbody');
       const tbodyExtra = document.querySelector('#extraDeck tbody');
-      const tbodySide = document.querySelector('#sideDeck tbody');
+      const totalsDiv = document.getElementById('totals');
       tbodyMain.innerHTML = '';
       tbodyExtra.innerHTML = '';
-      tbodySide.innerHTML = '';
+      totalsDiv.innerHTML = '';
 
       if (!targetUrl) {
         alert('URLを入力してください');
@@ -112,7 +109,7 @@
         const data = await res.json();
         const html = data.contents;
 
-        function extractDeck(htmlSection, tbody, showTotal = true) {
+        function extractDeck(htmlSection, tbody) {
           const rowBlocks = [...htmlSection.matchAll(/<tr class='[^']* row' title="([^"]+)">([\s\S]*?)<\/tr>/g)];
           let totalScore = 0;
 
@@ -142,55 +139,25 @@
             }
           }
 
-          if (showTotal) {
-            const totalRow = document.createElement('tr');
-            totalRow.innerHTML = `<td colspan="3"><strong>合計点数: ${totalScore}</strong></td>`;
-            tbody.appendChild(totalRow);
-
-            if (totalScore > 100) {
-              const warnRow = document.createElement('tr');
-              warnRow.innerHTML = `<td colspan="3" class="warning">※このデッキの点数が100を超えています！</td>`;
-              tbody.appendChild(warnRow);
-            }
-          }
+          return totalScore;
         }
 
-        extractDeck(html, tbodyMain);
+        const mainScore = extractDeck(html, tbodyMain);
 
         const extraTableMatch = html.match(/<table id="extra_list" class="deck_list">([\s\S]*?)<\/table>/);
+        let extraScore = 0;
         if (extraTableMatch) {
-          extractDeck(extraTableMatch[1], tbodyExtra);
+          extraScore = extractDeck(extraTableMatch[1], tbodyExtra);
         }
 
-        const sideTableMatch = html.match(/<table id="side_list" class="deck_list">([\s\S]*?)<\/table>/);
-        if (sideTableMatch) {
-          const sideHtml = sideTableMatch[1];
-          const sideRows = [...sideHtml.matchAll(/<tr class='[^']* row' title="([^"]+)">([\s\S]*?)<\/tr>/g)];
+        // 合計点数表示
+        totalsDiv.innerHTML = `
+          <p><strong>メインデッキ合計点数:</strong> ${mainScore}</p>
+          ${mainScore > 100 ? '<p class="warning">※メインデッキの点数が100を超えています！</p>' : ''}
+          <p><strong>エクストラデッキ合計点数:</strong> ${extraScore}</p>
+          ${extraScore > 100 ? '<p class="warning">※エクストラデッキの点数が100を超えています！</p>' : ''}
+        `;
 
-          for (const block of sideRows) {
-            const cardName = block[1].replace(/【(禁止|制限|準制限)カード】/g, '').trim();
-            const inner = block[2];
-
-            const cidMatch = inner.match(/value="[^"]*cid=(\d+)&?/);
-            const countMatch = inner.match(/<td class="num">\s*<span>\s*(\d+)\s*<\/span>/);
-
-            if (cidMatch && countMatch) {
-              const cid = cidMatch[1];
-              const count = parseInt(countMatch[1]);
-              const score = cardMap[cid]?.score ?? 0;
-
-              for (let i = 0; i < count; i++) {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                  <td style="display:none">${cid}</td>
-                  <td>${cardName}</td>
-                  <td>${score}</td>
-                `;
-                tbodySide.appendChild(row);
-              }
-            }
-          }
-        }
       } catch (err) {
         alert('HTMLの取得に失敗しました。CORS制限やURLの形式を確認してください。');
         console.error('取得エラー:', err);
@@ -199,3 +166,4 @@
   </script>
 </body>
 </html>
+ 
