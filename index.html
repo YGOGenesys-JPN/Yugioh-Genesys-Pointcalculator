@@ -43,6 +43,10 @@
       padding: 1em;
       border: 1px solid #ccc;
       margin-bottom: 2em;
+      width: 300px;
+    }
+    #usage p {
+      margin: 4px 0;
     }
     #loadingMessage {
       margin-bottom: 1em;
@@ -50,8 +54,9 @@
     }
     #comments {
       width: 300px;
-      margin-top: 40px;
-      padding: 10px;
+      padding: 8px;
+      font-size: 16px;
+      margin-top: 10px;
       background: #fff;
       border: 1px solid #ccc;
       min-height: 100px;
@@ -59,7 +64,7 @@
   </style>
 </head>
 <body>
-  <h2>遊戯王Genesys 点数計算ツール 2025/09/25版</h2>
+  <h2>遊戯王Genesys 点数計算ツール 2025/9/25版</h2>
 
   <div id="usage">
     <h3>使い方</h3>
@@ -69,8 +74,6 @@
     <p>サイドデッキは現在(2025/11)未対応です。今後対応するかもしれません。</p>
     <p>リンクモンスター、ペンデュラムモンスターについてはデッキレシピに含まれていた場合でも</p>
     <p>当ツールでは取得できません。各自でのチェックをお願いします。</p>
-    <p></p>
-    <p></p>
     <p><a href="scorelist.html" target="_blank">点数表はこちら</a></p>
   </div>
 
@@ -108,7 +111,6 @@
         return;
       }
 
-      // URLを②形式に変換（ytkn/ope/wnameが含まれていたら）
       if (/ytkn=|ope=|wname=/.test(targetUrl)) {
         const cgidMatch = targetUrl.match(/cgid=([a-zA-Z0-9]+)/);
         const dnoMatch = targetUrl.match(/dno=(\d+)/);
@@ -123,7 +125,6 @@
         }
       }
 
-      // cards.json を読み込む
       let cardMap = {};
       try {
         const cardRes = await fetch('cards.json');
@@ -136,7 +137,6 @@
         return;
       }
 
-      // HTMLを取得（CORS回避）
       const proxyUrl = "https://api.allorigins.win/get?url=" + encodeURIComponent(targetUrl);
 
       try {
@@ -145,7 +145,6 @@
         const data = await res.json();
         const html = data.contents;
 
-        // デッキ抽出関数
         function extractDeck(htmlSection, tbody) {
           const rowBlocks = [...htmlSection.matchAll(/<tr class='[^']* row' title="([^"]+)">([\s\S]*?)<\/tr>/g)];
           let totalScore = 0;
