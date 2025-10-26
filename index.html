@@ -54,25 +54,11 @@
     <tbody></tbody>
   </table>
 
-  <h3>エクストラデッキ合計点数</h3>
-  <table id="extraDeck">
-    <thead>
-      <tr>
-        <th style="display:none">CID</th>
-        <th>カード名</th>
-        <th>点数</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
-
   <script>
     document.getElementById('fetchBtn').addEventListener('click', async () => {
       const targetUrl = document.getElementById('urlInput').value.trim();
       const tbodyMain = document.querySelector('#mainDeck tbody');
-      const tbodyExtra = document.querySelector('#extraDeck tbody');
       tbodyMain.innerHTML = '';
-      tbodyExtra.innerHTML = '';
 
       if (!targetUrl) {
         alert('URLを入力してください');
@@ -144,12 +130,6 @@
 
         // メインデッキ抽出（全体HTMLから）
         extractDeck(html, tbodyMain);
-
-        // エクストラデッキ抽出（extra_list テーブルのみ）
-        const extraTableMatch = html.match(/<table id="extra_list" class="deck_list">([\s\S]*?)<\/table>/);
-        if (extraTableMatch) {
-          extractDeck(extraTableMatch[1], tbodyExtra);
-        }
 
       } catch (err) {
         alert('HTMLの取得に失敗しました。CORS制限やURLの形式を確認してください。');
