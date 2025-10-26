@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>遊戯王Genesys 点数計算ツール</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 2em;
+      background: #f9f9f9;
+      max-width: 800px;
+      margin: auto;
+    }
+    input, button {
+      font-size: 16px;
+      padding: 0.5em;
+      margin-bottom: 1em;
+      width: 100%;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+      margin-bottom: 2em;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 0.5em;
+      text-align: left;
+    }
+    th {
+      background: #eee;
+    }
+    .warning {
+      color: red;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h2>取得したいURLを入力してください</h2>
+  <input type="text" id="urlInput" placeholder="https://example.com" />
+  <button id="fetchBtn">URLからデッキの点数を表示</button>
+
+  <h3>メインデッキ合計点数</h3>
+  <table id="mainDeck">
+    <thead>
+      <tr>
+        <th style="display:none">CID</th>
+        <th>カード名</th>
+        <th>点数</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <h3>エクストラデッキ合計点数</h3>
+  <table id="extraDeck">
+    <thead>
+      <tr>
+        <th style="display:none">CID</th>
+        <th>カード名</th>
+        <th>点数</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <h3>サイドデッキ</h3>
+  <table id="sideDeck">
+    <thead>
+      <tr>
+        <th style="display:none">CID</th>
+        <th>カード名</th>
+        <th>点数</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    document.getElementById('fetchBtn').addEventListener('click', async () => {
+      const targetUrl = document.getElementById('urlInput').value.trim();
+      const tbodyMain = document.querySelector('#mainDeck tbody');
+      const tbodyExtra = document.querySelector('#extraDeck tbody');
+      const tbodySide = document.querySelector('#sideDeck tbody');
+      tbodyMain.innerHTML = '';
+      tbodyExtra.innerHTML = '';
+      tbodySide.innerHTML = '';
+
+      if (!targetUrl) {
+        alert('URLを入力してください');
+        return;
+      }
+
+      // cards.json を読み込む
+      let cardMap = {};
+      try {
+        const cardRes = await fetch('cards.json');
+        if (!cardRes.ok) throw new Error('cards.jsonの読み込みに失敗しました');
+        cardMap = await cardRes.json();
+      } catch (err) {
+        alert('cards.jsonの読み込みに失敗しました。ローカルサーバーで開いていますか？');
+        console.error(err);
+        return;
+      }
+
+      // HTMLを取得（CORS回避）
+      const proxyUrl = "https://api.allorigins.win/get?url=" + encodeURIComponent(targetUrl);
+
+      try {
+        const res = await fetch(proxyUrl);
+        if (!res.ok) throw new Error(`ステータスコード: ${res.status}`);
+        const data = await res.json();
+        const html = data.contents;
+
+        // 共通抽出関数
+        function extractDeck(htmlSection, tbody, showTotal = true) {
+          const rowBlocks = [...htmlSection.matchAll(/<tr class='[^']* row' title="([^"]+)">([\s\S]*?)<\/tr>/g)];
+          let totalScore = 0;
+
+          for (const block of rowBlocks) {
+            let cardName = block[1];
+            const inner = block[2];
+
+            const cidMatch = inner.match(/value="[^"]*cid=(\d+)&/);
+            const countMatch = inner.match(/<td class="num">\s*<span>(\d+)<\/span>/);
+
+            if (cidMatch && countMatch) {
+              const cid = cidMatch[1];
+              const count = parseInt(countMatch[1]);
+
+              cardName = cardName.replace(/【(禁止|制限|準制限)カード】/g, '').trim();
+              const score = cardMap[cid]?.score ?? 0;
+
+              for (let i = 0; i < count; i++) {
+                totalScore += score;
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                  <td style="display:none">${cid}</td>
+                  <td>${cardName}</td>
+                  <td>${score}</td>
+                `;
+                tbody.appendChild(row);
+              }
+            }
+          }
+
+          if (showTotal) {
+            const totalRow = document.createElement('tr');
+            totalRow.innerHTML = `<td colspan="3"><strong>合計点数: ${totalScore}</strong></td>`;
+            tbody.appendChild(totalRow);
+
+            if (totalScore > 100) {
+              const warnRow = document.createElement('tr');
+              warnRow.innerHTML = `<td colspan="3" class="warning">※このデッキの点数が100を超えています！</td>`;
+              tbody.appendChild(warnRow);
+            }
+          }
+        }
+
+        // メインデッキ抽出（全体HTMLから）
+        extractDeck(html, tbodyMain, true);
+
+        // エクストラデッキ抽出（extra_list テーブルのみ）
+        const extraTableMatch = html.match(/<table id="extra_list" class="deck_list">([\s\S]*?)<\/table>/);
+        if (extraTableMatch) {
+          extractDeck(extraTableMatch[1], tbodyExtra, true);
+        }
+
+        // サイドデッキ抽出（side ディブのみ）
+        const sideDivMatch = html.match(/<div id="side" class="card_set">([\s\S]*?)<\/div>/);
+        if (sideDivMatch) {
+          extractDeck(sideDivMatch[1], tbodySide, false); // 合計点数・警告なし
+        }
+      } catch (err) {
+        alert('HTMLの取得に失敗しました。CORS制限やURLの形式を確認してください。');
+        console.error('取得エラー:', err);
+      }
+    });
+  </script>
+</body>
+</html>
