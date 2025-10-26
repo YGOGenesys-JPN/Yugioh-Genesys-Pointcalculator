@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>URLからカード情報抽出ツール</title>
+  <title>遊戯王Genesys 点数計算ツール</title>
   <style>
     body {
       font-family: sans-serif;
@@ -16,15 +16,6 @@
       padding: 0.5em;
       margin-bottom: 1em;
       width: 100%;
-    }
-    textarea {
-      width: 100%;
-      height: 300px;
-      font-family: monospace;
-      font-size: 14px;
-      padding: 1em;
-      box-sizing: border-box;
-      margin-bottom: 2em;
     }
     table {
       width: 100%;
@@ -49,31 +40,28 @@
 <body>
   <h2>取得したいURLを入力してください</h2>
   <input type="text" id="urlInput" placeholder="https://example.com" />
-  <button id="fetchBtn">HTMLを取得して抽出する</button>
+  <button id="fetchBtn">URLからデッキの点数を表示</button>
 
-  <h3>取得したHTML</h3>
-  <textarea id="output" placeholder="ここにHTMLが表示されます..."></textarea>
-
-  <h3>抽出結果（メインデッキ）</h3>
+  <h3>メインデッキ合計点数</h3>
   <table id="mainDeck">
     <thead>
-      <tr><th>カードID</th><th>カード名</th><th>点数</th></tr>
+      <tr>
+        <th style="display:none">CID</th>
+        <th>カード名</th>
+        <th>点数</th>
+      </tr>
     </thead>
     <tbody></tbody>
   </table>
 
-  <h3>抽出結果（エクストラデッキ）</h3>
+  <h3>エクストラデッキ合計点数</h3>
   <table id="extraDeck">
     <thead>
-      <tr><th>カードID</th><th>カード名</th><th>点数</th></tr>
-    </thead>
-    <tbody></tbody>
-  </table>
-
-  <h3>抽出結果（サイドデッキ）</h3>
-  <table id="sideDeck">
-    <thead>
-      <tr><th>カードID</th><th>カード名</th><th>点数</th></tr>
+      <tr>
+        <th style="display:none">CID</th>
+        <th>カード名</th>
+        <th>点数</th>
+      </tr>
     </thead>
     <tbody></tbody>
   </table>
@@ -81,14 +69,10 @@
   <script>
     document.getElementById('fetchBtn').addEventListener('click', async () => {
       const targetUrl = document.getElementById('urlInput').value.trim();
-      const output = document.getElementById('output');
       const tbodyMain = document.querySelector('#mainDeck tbody');
       const tbodyExtra = document.querySelector('#extraDeck tbody');
-      const tbodySide = document.querySelector('#sideDeck tbody');
-      output.value = '';
       tbodyMain.innerHTML = '';
       tbodyExtra.innerHTML = '';
-      tbodySide.innerHTML = '';
 
       if (!targetUrl) {
         alert('URLを入力してください');
@@ -102,24 +86,22 @@
         if (!cardRes.ok) throw new Error('cards.jsonの読み込みに失敗しました');
         cardMap = await cardRes.json();
       } catch (err) {
-        alert('cards.jsonの読み込みに失敗しました。');
+        alert('cards.jsonの読み込みに失敗しました。ローカルサーバーで開いていますか？');
         console.error(err);
         return;
       }
 
-      // HTMLを取得
+      // HTMLを取得（CORS回避）
       const proxyUrl = "https://api.allorigins.win/get?url=" + encodeURIComponent(targetUrl);
 
       try {
         const res = await fetch(proxyUrl);
         if (!res.ok) throw new Error(`ステータスコード: ${res.status}`);
-
         const data = await res.json();
         const html = data.contents;
-        output.value = html;
 
         // 共通抽出関数
-        function extractDeck(htmlSection, tbody, showTotal = true) {
+        function extractDeck(htmlSection, tbody) {
           const rowBlocks = [...htmlSection.matchAll(/<tr class='[^']* row' title="([^"]+)">([\s\S]*?)<\/tr>/g)];
           let totalScore = 0;
 
@@ -133,53 +115,41 @@
             if (cidMatch && countMatch) {
               const cid = cidMatch[1];
               const count = parseInt(countMatch[1]);
+
               cardName = cardName.replace(/【(禁止|制限|準制限)カード】/g, '').trim();
               const score = cardMap[cid]?.score ?? 0;
 
               for (let i = 0; i < count; i++) {
                 totalScore += score;
                 const row = document.createElement('tr');
-                row.innerHTML = `<td>${cid}</td><td>${cardName}</td><td>${score}</td>`;
+                row.innerHTML = `
+                  <td style="display:none">${cid}</td>
+                  <td>${cardName}</td>
+                  <td>${score}</td>
+                `;
                 tbody.appendChild(row);
               }
             }
           }
 
-          if (showTotal) {
-            const totalRow = document.createElement('tr');
-            totalRow.innerHTML = `<td colspan="3"><strong>合計点数: ${totalScore}</strong></td>`;
-            tbody.appendChild(totalRow);
+          const totalRow = document.createElement('tr');
+          totalRow.innerHTML = `<td colspan="3"><strong>合計点数: ${totalScore}</strong></td>`;
+          tbody.appendChild(totalRow);
 
-            if (totalScore > 100) {
-              const warnRow = document.createElement('tr');
-              warnRow.innerHTML = `<td colspan="3" class="warning">※このデッキの点数が100を超えています！</td>`;
-              tbody.appendChild(warnRow);
-            }
+          if (totalScore > 100) {
+            const warnRow = document.createElement('tr');
+            warnRow.innerHTML = `<td colspan="3" class="warning">※このデッキの点数が100を超えています！</td>`;
+            tbody.appendChild(warnRow);
           }
         }
 
         // メインデッキ抽出（全体HTMLから）
-        const cidMatches = [...html.matchAll(/cid=(\d+)/g)];
-        const nameMatches = [...html.matchAll(/ja"\s+title="([^"]+)"\s+class="none"/g)];
-        const cidList = cidMatches.map(m => m[1]);
-        const nameList = nameMatches.map(m => m[1]);
-        const count = Math.min(cidList.length, nameList.length);
-        let mainHtml = '';
-        for (let i = 0; i < count; i++) {
-          mainHtml += `<tr class='row' title="${nameList[i]}"><td><input type="hidden" value="cid=${cidList[i]}&"></td><td class="num"><span>1</span></td></tr>`;
-        }
-        extractDeck(mainHtml, tbodyMain, true);
+        extractDeck(html, tbodyMain);
 
-        // エクストラデッキ抽出
-        const extraMatch = html.match(/<table id="extra_list" class="deck_list">([\s\S]*?)<\/table>/);
-        if (extraMatch) {
-          extractDeck(extraMatch[1], tbodyExtra, true);
-        }
-
-        // サイドデッキ抽出
-        const sideMatch = html.match(/<div id="side" class="card_set">([\s\S]*?)<\/div>/);
-        if (sideMatch) {
-          extractDeck(sideMatch[1], tbodySide, false);
+        // エクストラデッキ抽出（extra_list テーブルのみ）
+        const extraTableMatch = html.match(/<table id="extra_list" class="deck_list">([\s\S]*?)<\/table>/);
+        if (extraTableMatch) {
+          extractDeck(extraTableMatch[1], tbodyExtra);
         }
       } catch (err) {
         alert('HTMLの取得に失敗しました。CORS制限やURLの形式を確認してください。');
