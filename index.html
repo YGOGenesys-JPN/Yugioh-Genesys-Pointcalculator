@@ -120,8 +120,8 @@
             let cardName = block[1];
             const inner = block[2];
 
-            const cidMatch = inner.match(/value="[^"]*cid=(\d+)&/);
-            const countMatch = inner.match(/<td class="num">\s*<span>(\d+)<\/span>/);
+            const cidMatch = inner.match(/value="[^"]*cid=(\d+)&?/);
+            const countMatch = inner.match(/<td class="num">\s*<span>\s*(\d+)\s*<\/span>/);
 
             if (cidMatch && countMatch) {
               const cid = cidMatch[1];
@@ -162,29 +162,32 @@
           extractDeck(extraTableMatch[1], tbodyExtra);
         }
 
-        const sideBlockMatch = html.match(/<div id="side" class="card_set">([\s\S]*?)<\/div>/);
-        if (sideBlockMatch) {
-          const sideBlock = sideBlockMatch[1];
-          const cardLinks = [...sideBlock.matchAll(/<a[^>]*href="[^"]*cid=(\d+)[^"]*"[^>]*title="([^"]+)"[^>]*>/g)];
+        const sideTableMatch = html.match(/<table id="side_list" class="deck_list">([\s\S]*?)<\/table>/);
+        if (sideTableMatch) {
+          const sideHtml = sideTableMatch[1];
+          const sideRows = [...sideHtml.matchAll(/<tr class='[^']* row' title="([^"]+)">([\s\S]*?)<\/tr>/g)];
 
-          const cardCounts = new Map();
-          for (const [, cid, rawName] of cardLinks) {
-            const cleanName = rawName.replace(/【(禁止|制限|準制限)カード】/g, '').trim();
-            const key = `${cid}|${cleanName}`;
-            cardCounts.set(key, (cardCounts.get(key) ?? 0) + 1);
-          }
+          for (const block of sideRows) {
+            const cardName = block[1].replace(/【(禁止|制限|準制限)カード】/g, '').trim();
+            const inner = block[2];
 
-          for (const [key, count] of cardCounts.entries()) {
-            const [cid, cardName] = key.split('|');
-            const score = cardMap[cid]?.score ?? 0;
-            for (let i = 0; i < count; i++) {
-              const row = document.createElement('tr');
-              row.innerHTML = `
-                <td style="display:none">${cid}</td>
-                <td>${cardName}</td>
-                <td>${score}</td>
-              `;
-              tbodySide.appendChild(row);
+            const cidMatch = inner.match(/value="[^"]*cid=(\d+)&?/);
+            const countMatch = inner.match(/<td class="num">\s*<span>\s*(\d+)\s*<\/span>/);
+
+            if (cidMatch && countMatch) {
+              const cid = cidMatch[1];
+              const count = parseInt(countMatch[1]);
+              const score = cardMap[cid]?.score ?? 0;
+
+              for (let i = 0; i < count; i++) {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                  <td style="display:none">${cid}</td>
+                  <td>${cardName}</td>
+                  <td>${score}</td>
+                `;
+                tbodySide.appendChild(row);
+              }
             }
           }
         }
