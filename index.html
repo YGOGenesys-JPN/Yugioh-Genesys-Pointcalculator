@@ -93,19 +93,17 @@
         return;
       }
 
-      // cards.json を読み込む
       let cardMap = {};
       try {
         const cardRes = await fetch('cards.json');
         if (!cardRes.ok) throw new Error('cards.jsonの読み込みに失敗しました');
         cardMap = await cardRes.json();
       } catch (err) {
-        alert('cards.jsonの読み込みに失敗しました。ローカルサーバーで開いていますか？');
+        alert('cards.jsonの読み込みに失敗しました。');
         console.error(err);
         return;
       }
 
-      // HTMLを取得（CORS回避）
       const proxyUrl = "https://api.allorigins.win/get?url=" + encodeURIComponent(targetUrl);
 
       try {
@@ -114,7 +112,6 @@
         const data = await res.json();
         const html = data.contents;
 
-        // 共通抽出関数
         function extractDeck(htmlSection, tbody, showTotal = true) {
           const rowBlocks = [...htmlSection.matchAll(/<tr class='[^']* row' title="([^"]+)">([\s\S]*?)<\/tr>/g)];
           let totalScore = 0;
@@ -129,7 +126,6 @@
             if (cidMatch && countMatch) {
               const cid = cidMatch[1];
               const count = parseInt(countMatch[1]);
-
               cardName = cardName.replace(/【(禁止|制限|準制限)カード】/g, '').trim();
               const score = cardMap[cid]?.score ?? 0;
 
@@ -159,16 +155,13 @@
           }
         }
 
-        // メインデッキ抽出（全体HTMLから）
         extractDeck(html, tbodyMain);
 
-        // エクストラデッキ抽出（extra_list テーブルのみ）
         const extraTableMatch = html.match(/<table id="extra_list" class="deck_list">([\s\S]*?)<\/table>/);
         if (extraTableMatch) {
           extractDeck(extraTableMatch[1], tbodyExtra);
         }
 
-        // サイドデッキ抽出（<a>タグベース）
         const sideBlockMatch = html.match(/<div id="side" class="card_set">([\s\S]*?)<\/div>/);
         if (sideBlockMatch) {
           const sideBlock = sideBlockMatch[1];
