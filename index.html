@@ -6,16 +6,19 @@
   <style>
     body {
       font-family: sans-serif;
-      padding: 2em;
-      background: #f9f9f9;
-      max-width: 800px;
-      margin: auto;
+      margin: 20px;
+      background: #f0f0f0;
     }
     input, button {
       font-size: 16px;
-      padding: 0.5em;
-      margin-bottom: 1em;
-      width: 100%;
+      padding: 8px;
+      margin-bottom: 10px;
+    }
+    input {
+      width: 300px;
+    }
+    button {
+      margin-left: 10px;
     }
     table {
       width: 100%;
@@ -25,7 +28,7 @@
     }
     th, td {
       border: 1px solid #ccc;
-      padding: 0.5em;
+      padding: 8px;
       text-align: left;
     }
     th {
@@ -46,10 +49,11 @@
       font-weight: bold;
     }
     #comments {
-      margin-top: 4em;
-      padding: 2em;
-      background: #f0f0f0;
-      border: 1px dashed #aaa;
+      width: 300px;
+      margin-top: 40px;
+      padding: 10px;
+      background: #fff;
+      border: 1px solid #ccc;
       min-height: 100px;
     }
   </style>
@@ -80,7 +84,7 @@
   </table>
 
   <div id="comments">
-    <!-- コメントスペース -->
+    <!-- コメント欄：自由に記述できます -->
   </div>
 
   <script>
