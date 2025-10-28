@@ -38,7 +38,7 @@
 </head>
 <body>
   <h2>CIDリンク生成ツール</h2>
-  <p>カンマ区切りでCIDを入力してください（例：21349,12345,1245）</p>
+  <p>カンマ区切りでCIDを入力してください（例：21349,12345,67890）</p>
   <input type="text" id="cidInput" placeholder="CIDを入力" />
   <button id="generateBtn">リンク生成</button>
   <div id="loading"></div>
@@ -48,7 +48,7 @@
       <tr>
         <th>CID</th>
         <th>URL</th>
-        <th>ページタイトル</th>
+        <th>カード名（ページタイトル）</th>
       </tr>
     </thead>
     <tbody></tbody>
@@ -70,7 +70,7 @@
 
       const cidList = input.split(',').map(cid => cid.trim()).filter(cid => /^\d+$/.test(cid));
       for (const cid of cidList) {
-        const url = `https://www.db.yugioh-card.com/yugiohdb/card_search.action?ope=2&cid=${cid}&request_locale=ja`;
+        const url = `https://www.db.yugioh-card.com/yugiohdb/card_search.action?ope=2&cid=${cid}&request_locale=jp`;
 
         try {
           const proxyUrl = "https://api.allorigins.win/get?url=" + encodeURIComponent(url);
@@ -80,13 +80,14 @@
           const html = data.contents;
 
           const titleMatch = html.match(/<title>(.*?)<\/title>/);
-          const pageTitle = titleMatch ? titleMatch[1].replace(/<\/?[^>]+(>|$)/g, "") : 'タイトル取得失敗';
+          const fullTitle = titleMatch ? titleMatch[1].trim() : 'タイトル取得失敗';
+          const cardName = fullTitle.split('|')[0].trim(); // 最初の「|」の前をカード名とする
 
           const row = document.createElement('tr');
           row.innerHTML = `
             <td>${cid}</td>
             <td><a href="${url}" target="_blank">${url}</a></td>
-            <td>${pageTitle}</td>
+            <td>${cardName}</td>
           `;
           tbody.appendChild(row);
         } catch (err) {
