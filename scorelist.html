@@ -54,6 +54,7 @@
   <input type="text" id="filterInput" placeholder="カード名で検索...">
   <input type="number" id="scoreInput" placeholder="点数で検索..." min="0">
   <button id="sortToggleBtn">点数で昇順に並べる</button>
+  <button id="clearBtn">検索クリア</button>
 
   <div id="sortStatus">現在の並び順：Unicode順</div>
 
@@ -73,6 +74,7 @@
     const sortToggleBtn = document.getElementById('sortToggleBtn');
     const filterInput = document.getElementById('filterInput');
     const scoreInput = document.getElementById('scoreInput');
+    const clearBtn = document.getElementById('clearBtn');
     let sortByScore = false;
 
     function renderTable(nameFilter = '', scoreFilter = '') {
@@ -110,6 +112,12 @@
       sortStatus.textContent = sortByScore ? '現在の並び順：点数昇順' : '現在の並び順：Unicode順';
       sortToggleBtn.textContent = sortByScore ? 'Unicode順に並べる' : '点数で昇順に並べる';
       renderTable(filterInput.value.trim(), scoreInput.value.trim());
+    });
+
+    clearBtn.addEventListener('click', function() {
+      filterInput.value = '';
+      scoreInput.value = '';
+      renderTable();
     });
 
     async function loadCardData() {
