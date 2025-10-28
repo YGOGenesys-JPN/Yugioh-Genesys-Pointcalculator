@@ -8,17 +8,22 @@
       font-family: sans-serif;
       margin: 20px;
       background: #f0f0f0;
+      color: #333;
     }
-    input, button {
+    input {
+      width: 300px;
       font-size: 16px;
       padding: 8px;
       margin-bottom: 10px;
     }
-    input {
-      width: 300px;
-    }
     button {
       margin-left: 10px;
+      background-color: #4070FF;
+      color: #FFF;
+      border-color:  #4070FF;
+      font-size: 16px;
+      padding: 6px;
+      margin-bottom: 10px;
     }
     table {
       width: 100%;
@@ -38,6 +43,10 @@
       color: red;
       font-weight: bold;
     }
+    a {  
+      color: #1D3994;
+      text-decoration: none;
+    }
     #usage {
       background: #fff;
       padding: 1em;
@@ -47,6 +56,9 @@
     }
     #usage p {
       margin: 4px 0;
+    }
+    #usage h3 {
+      margin-top: 0;
     }
     #loadingMessage {
       margin-bottom: 1em;
@@ -75,19 +87,19 @@
 
   <div id="usage">
     <h3>使い方</h3>
-    <p>遊戯王DBのデッキURLを入力し「URLからデッキの点数を表示」ボタンを押すことで、デッキ内のカード点数と合計点数を表示できます。</p>
-    <p>当ツールを利用する際、点数を確認したいデッキは「公開」状態のみチェックすることができます。「非公開」の場合は設定の変更をお願いします。</p>
-    <p>メインデッキとエクストラデッキのカードの点数とその合計点を表示します。</p>
-    <p>サイドデッキは現在(2025/11)未対応です。今後対応するかもしれません。</p>
-    <p>リンクモンスター、ペンデュラムモンスターについてはデッキレシピに含まれていた場合でも、当ツールでは取得できません。各自でのチェックをお願いします。</p>
-    <p>遊戯王ニューロン（アプリ）から取得できる[http://neuron.konami.net]から始まるURLには対応しておりません。</p>
-    <p><a href="https://www.db.yugioh-card.com/yugiohdb/?request_locale=ja" target="_blank">遊戯王ニューロン</a>にアクセスいただき、こちらからURLを取得してください</p>
-    <br>
+    <ul>
+      <li>遊戯王DBのデッキURLを入力し「点数を表示」ボタンを押すことで、デッキ内のカードの各点数と合計点数を表示できます。</li>
+      <li>当ツールで点数を確認したいデッキは「公開」状態である必要があります。「非公開」の場合は設定の変更してください</li>
+      <li>メインデッキとエクストラデッキのカードのみ計算します。サイドデッキは現在(2025/11)未対応です。</li>
+      <li>リンクモンスター、ペンデュラムモンスターについてはデッキレシピに含まれていた場合でも、当ツールでは取得できません。</li>
+      <li>遊戯王ニューロン（アプリ）から取得できる[http://neuron.konami.net]から始まるURLには対応しておりません。</li>
+      <li><a href="https://www.db.yugioh-card.com/yugiohdb/?request_locale=ja" target="_blank">遊戯王カードゲームDB</a>からURLを取得してください</li>
+    </ul>
     <p><a href="scorelist.html" target="_blank">点数表はこちら</a></p>
   </div>
 
-  <input type="text" id="urlInput" placeholder="https://www.db.yugioh-card.com/yugiohdb/" />
-  <button id="fetchBtn">URLからデッキの点数を表示</button>
+  <input type="text" id="urlInput" placeholder="URL(カードゲームDB)" />
+  <button id="fetchBtn">点数を計算</button>
   <div id="loadingMessage"></div>
 
   <h3>デッキ合計点数</h3>
