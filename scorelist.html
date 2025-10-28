@@ -13,10 +13,16 @@
       color: #333;
     }
     input {
-      width: 300px;
       padding: 8px;
       font-size: 16px;
       margin-bottom: 10px;
+    }
+    #filterInput {
+      width: 300px;
+    }
+    #scoreInput {
+      width: 150px;
+      margin-left: 10px;
     }
     button {
       padding: 8px 16px;
@@ -46,6 +52,7 @@
   <h1>遊戯王Genesys点数表(日本語) 2025/10/27版</h1>
 
   <input type="text" id="filterInput" placeholder="カード名で検索...">
+  <input type="number" id="scoreInput" placeholder="点数で検索..." min="0">
   <button id="sortToggleBtn">点数で昇順に並べる</button>
 
   <div id="sortStatus">現在の並び順：Unicode順</div>
@@ -64,13 +71,19 @@
     const tableBody = document.getElementById('tableBody');
     const sortStatus = document.getElementById('sortStatus');
     const sortToggleBtn = document.getElementById('sortToggleBtn');
+    const filterInput = document.getElementById('filterInput');
+    const scoreInput = document.getElementById('scoreInput');
     let sortByScore = false;
 
-    function renderTable(filter = '') {
+    function renderTable(nameFilter = '', scoreFilter = '') {
       tableBody.innerHTML = '';
       let entries = Object.entries(cardData);
 
-      entries = entries.filter(([cid, info]) => info.name.includes(filter));
+      entries = entries.filter(([cid, info]) => {
+        const nameMatch = info.name.includes(nameFilter);
+        const scoreMatch = scoreFilter === '' || info.score === Number(scoreFilter);
+        return nameMatch && scoreMatch;
+      });
 
       if (sortByScore) {
         entries.sort((a, b) => a[1].score - b[1].score);
@@ -84,20 +97,21 @@
       });
     }
 
-    document.getElementById('filterInput').addEventListener('input', function() {
-      const keyword = this.value.trim();
-      renderTable(keyword);
+    filterInput.addEventListener('input', function() {
+      renderTable(filterInput.value.trim(), scoreInput.value.trim());
+    });
+
+    scoreInput.addEventListener('input', function() {
+      renderTable(filterInput.value.trim(), scoreInput.value.trim());
     });
 
     sortToggleBtn.addEventListener('click', function() {
       sortByScore = !sortByScore;
-      const keyword = document.getElementById('filterInput').value.trim();
       sortStatus.textContent = sortByScore ? '現在の並び順：点数昇順' : '現在の並び順：Unicode順';
       sortToggleBtn.textContent = sortByScore ? 'Unicode順に並べる' : '点数で昇順に並べる';
-      renderTable(keyword);
+      renderTable(filterInput.value.trim(), scoreInput.value.trim());
     });
 
-    // cards.json を読み込む
     async function loadCardData() {
       try {
         const res = await fetch('cards.json');
@@ -110,7 +124,6 @@
       }
     }
 
-    // 初期表示
     sortStatus.textContent = '現在の並び順：Unicode順';
     sortToggleBtn.textContent = '点数で昇順に並べる';
     loadCardData();
