@@ -79,4 +79,30 @@
           const data = await res.json();
           const html = data.contents;
 
-          const titleMatch
+          const titleMatch = html.match(/<title>(.*?)<\/title>/);
+          const pageTitle = titleMatch ? titleMatch[1].replace(/<\/?[^>]+(>|$)/g, "") : 'タイトル取得失敗';
+
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${cid}</td>
+            <td><a href="${url}" target="_blank">${url}</a></td>
+            <td>${pageTitle}</td>
+          `;
+          tbody.appendChild(row);
+        } catch (err) {
+          console.error(err);
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${cid}</td>
+            <td><a href="${url}" target="_blank">${url}</a></td>
+            <td>取得失敗</td>
+          `;
+          tbody.appendChild(row);
+        }
+      }
+
+      loading.textContent = '';
+    });
+  </script>
+</body>
+</html>
