@@ -70,7 +70,7 @@
 
       const cidList = input.split(',').map(cid => cid.trim()).filter(cid => /^\d+$/.test(cid));
       for (const cid of cidList) {
-        const url = `https://www.db.yugioh-card.com/yugiohdb/card_search.action?ope=2&cid=${cid}&request_locale=jp`;
+        const url = `https://www.db.yugioh-card.com/yugiohdb/card_search.action?ope=2&cid=${cid}&request_locale=ja`;
 
         try {
           const proxyUrl = "https://api.allorigins.win/get?url=" + encodeURIComponent(url);
