@@ -203,9 +203,15 @@
 
           cidTextBlock.textContent = cidNameList.join('\n');
         }
-
         extractDeck(html, tbodyMain);
         loadingDiv.textContent = '';
       } catch (err) {
         alert('HTMLの取得に失敗しました。CORS制限やURLの形式を確認してください。');
-        console.error('取得エラー:', err
+        console.error('取得エラー:', err);
+        loadingDiv.textContent = '';
+      }
+    });
+  </script>
+</body>
+</html>
+
