@@ -61,6 +61,13 @@
       border: 1px solid #ccc;
       min-height: 100px;
     }
+    #cidTextBlock {
+      background: #fff;
+      padding: 1em;
+      border: 1px solid #ccc;
+      margin-top: 2em;
+      white-space: pre-wrap;
+    }
   </style>
 </head>
 <body>
@@ -96,17 +103,20 @@
   </table>
 
   <div id="comments">
-    <!-- コメント欄：自由に記述できます -->
     <p>フリー記入スペース、今後考える予定</p>
     <p>所謂工事中</p>
   </div>
+
+  <div id="cidTextBlock"></div>
 
   <script>
     document.getElementById('fetchBtn').addEventListener('click', async () => {
       let targetUrl = document.getElementById('urlInput').value.trim();
       const tbodyMain = document.querySelector('#mainDeck tbody');
       const loadingDiv = document.getElementById('loadingMessage');
+      const cidTextBlock = document.getElementById('cidTextBlock');
       tbodyMain.innerHTML = '';
+      cidTextBlock.textContent = '';
       loadingDiv.textContent = 'デッキ情報を取得しています…';
 
       if (!targetUrl) {
@@ -152,6 +162,7 @@
         function extractDeck(htmlSection, tbody) {
           const rowBlocks = [...htmlSection.matchAll(/<tr class='[^']* row' title="([^"]+)">([\s\S]*?)<\/tr>/g)];
           let totalScore = 0;
+          let cidNameList = [];
 
           for (const block of rowBlocks) {
             let cardName = block[1];
@@ -175,6 +186,7 @@
                   <td>${score}</td>
                 `;
                 tbody.appendChild(row);
+                cidNameList.push(`${cid},${cardName}`);
               }
             }
           }
@@ -188,16 +200,12 @@
             warnRow.innerHTML = `<td colspan="3" class="warning">※デッキの点数が100を超えています！</td>`;
             tbody.appendChild(warnRow);
           }
+
+          cidTextBlock.textContent = cidNameList.join('\n');
         }
 
         extractDeck(html, tbodyMain);
         loadingDiv.textContent = '';
       } catch (err) {
         alert('HTMLの取得に失敗しました。CORS制限やURLの形式を確認してください。');
-        console.error('取得エラー:', err);
-        loadingDiv.textContent = '';
-      }
-    });
-  </script>
-</body>
-</html>
+        console.error('取得エラー:', err
