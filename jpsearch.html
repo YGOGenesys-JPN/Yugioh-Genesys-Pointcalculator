@@ -48,7 +48,7 @@
       <tr>
         <th>CID</th>
         <th>URL</th>
-        <th>ページ名</th>
+        <th>日本語カード名</th>
       </tr>
     </thead>
     <tbody></tbody>
@@ -70,7 +70,7 @@
 
       const cidList = input.split(',').map(cid => cid.trim()).filter(cid => /^\d+$/.test(cid));
       for (const cid of cidList) {
-        const url = `https://www.db.yugioh-card.com/yugiohdb/card_search.action?ope=2&cid=${cid}&request_locale=jp`;
+        const url = `https://www.db.yugioh-card.com/yugiohdb/card_search.action?ope=2&cid=${cid}&request_locale=ja`;
 
         try {
           const proxyUrl = "https://api.allorigins.win/get?url=" + encodeURIComponent(url);
@@ -79,14 +79,14 @@
           const data = await res.json();
           const html = data.contents;
 
-          const titleMatch = html.match(/<title>(.*?)<\/title>/);
-          const pageTitle = titleMatch ? titleMatch[1].replace(/<\/?[^>]+(>|$)/g, "") : 'タイトル取得失敗';
+          const nameMatch = html.match(/<h1 class="card_name">([^<]+)<\/h1>/);
+          const japaneseName = nameMatch ? nameMatch[1].trim() : 'カード名取得失敗';
 
           const row = document.createElement('tr');
           row.innerHTML = `
             <td>${cid}</td>
             <td><a href="${url}" target="_blank">${url}</a></td>
-            <td>${pageTitle}</td>
+            <td>${japaneseName}</td>
           `;
           tbody.appendChild(row);
         } catch (err) {
