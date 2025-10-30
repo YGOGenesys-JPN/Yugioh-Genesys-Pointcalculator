@@ -6,7 +6,7 @@
   <style>
     body {
       font-family: sans-serif;
-      margin: 20px;
+      margin: 20px 20px 0 20px; /*scorelistとここだけかえた*/
       background: #f0f0f0;
       color: #333;
     }
@@ -28,7 +28,7 @@
       width: stretch;
       border-collapse: collapse;
       background: #fff;
-      margin-bottom: 2em;
+      margin-bottom: 200px;
     }
     th, td {
       border: 1px solid #ccc;
@@ -69,26 +69,34 @@
       margin-bottom: 1em;
       font-weight: bold;
     }
-    #comments {
-      width: stretch;
-      padding: 8px;
-      font-size: 16px;
-      margin-top: 10px;
-      background: #fff;
-      border: 1px solid #ccc;
-      min-height: 100px;
+    footer {
+      background-color: #333;
+      color: whitesmoke;
+      padding: 20px 20px;
+      margin-left: -20px;
+      margin-right: -20px;
+      display: block;
+      justify-content: space-around;
     }
-     #comments p {
-      margin: 4px 0;
+    .footer-menu h3 {
+      margin-top: 5px;
+      margin-bottom: 5px;
     }
-    #comments h3 {
-      margin-top: 0;
+    .footer-menu ul {
+      margin-top: 5px;
+      margin-bottom: 20px;
+    }
+    .footer-menu p {
+      margin: 0;
+    }
+    footer a {
+      color: #27C;
     }
   </style>
+
 </head>
 <body>
   <h2>遊戯王Genesys 点数計算ツール 2025/10/27版</h2>
-
   <div id="usage">
     <h3>使い方</h3>
     <ul>
@@ -118,21 +126,26 @@
     </thead>
     <tbody></tbody>
   </table>
-
-  <div id="comments">
-    <p>このサイトは遊戯王OCGの非公式ファンコンテンツです。株式会社コナミデジタルエンタテインメントとは一切関係ありません。</p>
-    <p>遊戯王OCGおよび関連する画像・名称・データは、株式会社コナミデジタルエンタテインメントの著作物・商標です。<p>
-    <p>本サイトは非商用の個人制作ツールです。収益目的での運営・配布は行っておりません。</p>    
-    <p>ご質問やご要望があればこちらに連絡をお願いします。</p>
-    <p><a href="https://x.com/rusesaaaaaaaaan/" target="_blank">X:@Rusesaaaaaaaaan</a> </p>
-    <br>
-    <p>最終更新日:2025/10/30</p>
-    <p>参照元：<a href="https://www.yugioh-card.com/en/genesys/" target="_blank">https://www.yugioh-card.com/en/genesys/</a></p>
-    
-  </div>
   
   <div id="cidTextBlock"></div>
- 
+  <footer>
+    <div class="footer-menu">
+      <h3>権利・商標</h3>
+      <ul>
+        <li>このサイトは遊戯王OCGの非公式ファンコンテンツです。株式会社コナミデジタルエンタテインメントとは一切関係ありません。</li>
+        <li>遊戯王OCGおよび関連する画像・名称・データは、株式会社コナミデジタルエンタテインメントの著作物・商標です。</li>
+        <li>本サイトは非商用の個人制作ツールです。収益目的での運営・配布は行っておりません。</li>
+        <li>参照元：<a href="https://www.yugioh-card.com/en/genesys/" target="_blank">https://www.yugioh-card.com/en/genesys/</a></li>
+      </ul>
+    </div>
+    <div class="footer-menu">
+      <h3>当サイトについて</h3>
+      <p>お問い合わせ：<a href="https://x.com/rusesaaaaaaaaan/" target="_blank">X:@Rusesaaaaaaaaan</a></p>
+      <p>© 2025 <a href="https://x.com/rusesaaaaaaaaan/" target="_blank">@Rusesaaaaaaaaan</a></p>
+      <p>最終更新日:2025/10/30</p>
+    </div>
+  </footer>
+
   <script>
     document.getElementById('fetchBtn').addEventListener('click', async () => {
       let targetUrl = document.getElementById('urlInput').value.trim();
