@@ -93,11 +93,11 @@
     <h3>使い方</h3>
     <ul>
       <li>遊戯王DBのデッキURLを入力し「点数を計算」ボタンを押すことで、デッキ内のカードの各点数と合計点数を表示できます。</li>
-      <li>当ツールで点数を確認したいデッキは「公開」状態である必要があります。「非公開」の場合は設定の変更してください</li>
+      <li>当ツールで点数を確認したいデッキは「公開」状態である必要があります。「非公開」の場合は設定の変更してください。</li>
       <li>メインデッキとエクストラデッキのカードのみ計算します。サイドデッキは現在(2025/11)未対応です。</li>
       <li>リンクモンスター、ペンデュラムモンスターについてはデッキレシピに含まれていた場合でも、当ツールでは取得できません。</li>
-      <li>遊戯王ニューロン（アプリ）から取得できる[http://neuron.konami.net]から始まるURLには対応しておりません。</li>
       <li><a href="https://www.db.yugioh-card.com/yugiohdb/?request_locale=ja" target="_blank">遊戯王ニューロン(WEB)</a>からURLを取得してください。</li>
+      <li>遊戯王ニューロン（アプリ）から取得できる[http://neuron.konami.net]から始まるURLには対応しておりません。</li>
       <li>また注意点として、稀に情報取得に失敗することがあります。その際はページを読み込みなおし、再度実行をお願いします。</li>
     </ul>
     <p><a href="scorelist.html" target="_blank">点数表はこちら</a></p>
@@ -123,7 +123,7 @@
     <p>このサイトは遊戯王OCGの非公式ファンコンテンツです。株式会社コナミデジタルエンタテインメントとは一切関係ありません。</p>
     <p>遊戯王OCGおよび関連する画像・名称・データは、株式会社コナミデジタルエンタテインメントの著作物・商標です。<p>
     <p>本サイトは非商用の個人制作ツールです。収益目的での運営・配布は行っておりません。</p>    
-    <p>なにかあればこちらへ連絡をお願いします</p>
+    <p>ご質問やご要望があればこちらに連絡をお願いします。</p>
     <p><a href="https://x.com/rusesaaaaaaaaan/" target="_blank">X:@Rusesaaaaaaaaan</a> </p>
     <br>
     <p>最終更新日:2025/10/30</p>
@@ -224,8 +224,6 @@
             warnRow.innerHTML = `<td colspan="3" class="warning">※デッキの点数が100を超えています！</td>`;
             tbody.appendChild(warnRow);
           }
-
-          cidTextBlock.textContent = cidNameList.join('\n');
         }
         extractDeck(html, tbodyMain);
         loadingDiv.textContent = '';
