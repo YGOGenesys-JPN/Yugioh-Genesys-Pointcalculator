@@ -159,9 +159,11 @@
       const tbodyMain = document.querySelector('#mainDeck tbody');
       const loadingDiv = document.getElementById('loadingMessage');
       const cidTextBlock = document.getElementById('cidTextBlock');
+      /* 沙月追加 ここから */
       const deckTotalPoint = document.getElementById('deckTotalPoint');
-      deckTotalPoint.innerHTML = ''; // 沙月追加しました
-      deckTotalPoint.style.color = ''; // 沙月追加しました
+      deckTotalPoint.innerHTML = '';
+      deckTotalPoint.style.color = '';
+      /* 沙月追加 ここまで */
       tbodyMain.innerHTML = '';
       cidTextBlock.textContent = '';
       loadingDiv.textContent = 'デッキ情報を取得しています…';
