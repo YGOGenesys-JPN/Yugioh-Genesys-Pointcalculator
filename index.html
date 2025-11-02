@@ -121,7 +121,7 @@
   <button id="fetchBtn">点数を計算</button>
   <div id="loadingMessage"></div>
 
-  <h3>デッキ合計点数</h3>
+  <h3>デッキ合計点数<span id="deckTotalPoint"></span></h3>
   <table id="mainDeck">
     <thead>
       <tr>
@@ -159,6 +159,7 @@
       const tbodyMain = document.querySelector('#mainDeck tbody');
       const loadingDiv = document.getElementById('loadingMessage');
       const cidTextBlock = document.getElementById('cidTextBlock');
+      const deckTotalPoint = document.getElementById('deckTotalPoint');
       tbodyMain.innerHTML = '';
       cidTextBlock.textContent = '';
       loadingDiv.textContent = 'デッキ情報を取得しています…';
@@ -238,11 +239,15 @@
           const totalRow = document.createElement('tr');
           totalRow.innerHTML = `<td colspan="3"><strong>合計点数: ${totalScore}</strong></td>`;
           tbody.appendChild(totalRow);
+          deckTotalPoint.innerHTML = ` ${totalScore}点` // 沙月追加しました
 
           if (totalScore > 100) {
             const warnRow = document.createElement('tr');
             warnRow.innerHTML = `<td colspan="3" class="warning">※デッキの点数が100を超えています！</td>`;
             tbody.appendChild(warnRow);
+            deckPointElement.style.color = '#f00'; // 沙月追加しました
+          } else {
+            deckPointElement.style.color = ''; // 沙月追加しました
           }
         }
         extractDeck(html, tbodyMain);
