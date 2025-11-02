@@ -245,9 +245,9 @@
             const warnRow = document.createElement('tr');
             warnRow.innerHTML = `<td colspan="3" class="warning">※デッキの点数が100を超えています！</td>`;
             tbody.appendChild(warnRow);
-            deckPointElement.style.color = '#f00'; // 沙月追加しました
+            deckTotalPoint.style.color = '#f00'; // 沙月追加しました
           } else {
-            deckPointElement.style.color = ''; // 沙月追加しました
+            deckTotalPoint.style.color = ''; // 沙月追加しました
           }
         }
         extractDeck(html, tbodyMain);
