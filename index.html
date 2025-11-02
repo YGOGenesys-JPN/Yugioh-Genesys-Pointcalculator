@@ -6,9 +6,10 @@
   <style>
     body {
       font-family: sans-serif;
-      margin: 20px 20px 0 20px; /*scorelistとここだけかえた*/
+      margin: 20px 20px 0; /*scorelistとの差分*/
       background: #f0f0f0;
       color: #333;
+      padding-bottom: 200px; /*scorelistとの差分*/
     }
     input {
       font-size: 16px;
@@ -17,9 +18,9 @@
     }
     button {
       margin-left: 10px;
-      background-color: #4070FF;
-      color: #FFF;
-      border-color:  #4070FF;
+      background-color: #4070ff;
+      color: #fff;
+      border-color:  #4070ff;
       font-size: 16px;
       padding: 6px;
       margin-bottom: 10px;
@@ -28,7 +29,7 @@
       width: stretch;
       border-collapse: collapse;
       background: #fff;
-      margin-bottom: 100px;
+      margin-bottom: 30px;
     }
     th, td {
       border: 1px solid #ccc;
@@ -36,12 +37,12 @@
       text-align: left;
     }
     th {
-      color: #1D3994;
+      color: #1d3994;
       background-color: #f1f5ff;
     }
     /* scorelistとここまで共通 */
     a {  
-      color: #1D3994;
+      color: #1d3994;
       text-decoration: none;
       font-weight: bold;
     }
@@ -72,25 +73,30 @@
     footer {
       background-color: #333;
       color: whitesmoke;
-      padding: 20px 20px;
+      padding: 8px 20px;
       margin-left: -20px;
-      margin-right: -20px;
-      display: block;
-      justify-content: space-around;
+      position: fixed;
+      bottom: 0;
+      width: stretch;
     }
     .footer-menu h3 {
+      font-size: 14px;
       margin-top: 5px;
       margin-bottom: 5px;
     }
     .footer-menu ul {
       margin-top: 5px;
-      margin-bottom: 20px;
+      margin-bottom: 10px;
+    }
+    .footer-menu li {
+      font-size: 10px;
     }
     .footer-menu p {
       margin: 0;
+      font-size: 10px;
     }
     footer a {
-      color: #27C;
+      color: #27c;
     }
   </style>
 
@@ -101,14 +107,14 @@
     <h3>使い方</h3>
     <ul>
       <li>遊戯王DBのデッキURLを入力し「点数を計算」ボタンを押すことで、デッキ内のカードの各点数と合計点数を表示できます。</li>
-      <li>当ツールで点数を確認したいデッキは「公開」状態である必要があります。「非公開」の場合は設定の変更してください。</li>
+      <li>当ツールで点数を確認したいデッキは「<span class="warning">公開</span>」状態である必要があります。「非公開」の場合は設定を変更してください。</li>
       <li>メインデッキとエクストラデッキのカードのみ計算します。サイドデッキは現在(2025/11)未対応です。</li>
-      <li>リンクモンスター、ペンデュラムモンスターについてはデッキレシピに含まれていた場合でも、当ツールでは取得できません。</li>
-      <li><a href="https://www.db.yugioh-card.com/yugiohdb/?request_locale=ja" target="_blank">遊戯王ニューロン(WEB)</a>からURLを取得してください。</li>
-      <li>遊戯王ニューロン(アプリ)から取得できる[http://neuron.konami.net]から始まるURLには対応しておりません。</li>
-      <li>注意点として、稀に情報取得に失敗することがあります。その際はページを読み込みなおし、再度実行をお願いします。</li>
+      <li>リンクモンスター、ペンデュラムモンスターについてはデッキレシピに含まれていた場合でも、当ツールではエラー表示できません。</li>
+      <li>遊戯王ニューロン(アプリ)から取得できる[http://neuron.konami.net]から始まるURLには対応しておりません。<br>
+        <a href="https://www.db.yugioh-card.com/yugiohdb/?request_locale=ja" target="_blank">遊戯王ニューロン(WEB)</a>で<span class="warning"> [https://www.db.yugioh-card.com] から始まるURL</span>を取得してください。</li>
+      <li>情報取得に失敗した場合はリロードの上、再度実行をお願いします。</li>
     </ul>
-    <p><a href="scorelist.html" target="_blank">点数表はこちら</a></p>
+    <p>点数表は<a href="scorelist.html" target="_blank">こちら</a></p>
   </div>
 
   <input type="text" id="urlInput" placeholder="URL 遊戯王ニューロン(WEB)" />
@@ -141,9 +147,9 @@
     </div>
     <div class="footer-menu">
       <h3>当サイトについて</h3>
-      <p>お問い合わせ：<a href="https://x.com/rusesaaaaaaaaan/" target="_blank">X:@Rusesaaaaaaaaan</a></p>
+      <p>お問い合わせ:<a href="https://x.com/rusesaaaaaaaaan/" target="_blank">X:@Rusesaaaaaaaaan</a></p>
+      <p>最終更新日:2025/11/2</p>
       <p>© 2025 <a href="https://x.com/rusesaaaaaaaaan/" target="_blank">@Rusesaaaaaaaaan</a></p>
-      <p>最終更新日:2025/10/30</p>
     </div>
   </footer>
 
