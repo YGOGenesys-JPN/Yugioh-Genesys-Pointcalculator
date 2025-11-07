@@ -6,10 +6,10 @@
   <style>
     body {
       font-family: sans-serif;
-      margin: 20px 20px 0; /*scorelistとの差分*/
+      margin: 20px 20px 0;
       background: #f0f0f0;
       color: #333;
-      padding-bottom: 200px; /*scorelistとの差分*/
+      padding-bottom: 200px;
     }
     input {
       font-size: 16px;
@@ -40,7 +40,6 @@
       color: #1d3994;
       background-color: #f1f5ff;
     }
-    /* scorelistとここまで共通 */
     a {  
       color: #1d3994;
       text-decoration: none;
@@ -107,13 +106,12 @@
     <h3>使い方</h3>
     <ul>
       <li>遊戯王DBのデッキURLを入力し「点数を計算」ボタンを押すことで、デッキ内のカードの各点数と合計点数を表示できます。</li>
-      <li>当ツールで点数を確認したいデッキは「<span class="warning">公開</span>」状態である必要があります。「非公開」の場合は設定を変更してください。</li>
-      <li>メインデッキとエクストラデッキのカードのみ計算します。サイドデッキは現在(2025/11)未対応です。</li>
-      <li>リンクモンスター、ペンデュラムモンスターについてはデッキレシピに含まれていた場合でも、当ツールではエラー表示できません。</li>
-      <li>遊戯王ニューロン(アプリ)から取得できる[http://neuron.konami.net]から始まるURLには対応しておりません。<br>
-        <a href="https://www.db.yugioh-card.com/yugiohdb/?request_locale=ja" target="_blank">遊戯王ニューロン(WEB)</a>で<span class="warning"> [https://www.db.yugioh-card.com] から始まるURL</span>を取得してください。</li>
-      <li>情報取得に失敗した場合はリロードの上、再度実行をお願いします。</li>
-      <li>利用しているAPI[api.allorigins.win]が不安定で取得できない場合があります何度も実行して取得ができない場合は、時間を空けて試してみてください。</li>     
+      <li>当ツールで点数を確認したいデッキは「<span class="warning">公開</span>」状態である必要があります。</li>
+      <li>メインデッキとエクストラデッキのみ対応。サイドデッキは未対応です。</li>
+      <li>リンク・ペンデュラムモンスターは一部未対応です。</li>
+      <li>ニューロンアプリのURL（neuron.konami.net）は非対応。WEB版のURLをご利用ください。</li>
+      <li>情報取得に失敗した場合はリロードして再実行してください。</li>
+      <li>利用しているAPI [corsproxy.io] が不安定な場合があります。取得できない場合は時間を空けて再試行してください。</li>
     </ul>
     <p>点数表は<a href="scorelist.html" target="_blank">こちら</a></p>
   </div>
@@ -140,10 +138,10 @@
       <h3>権利・商標</h3>
       <ul>
         <li>このサイトは遊戯王OCGの非公式ファンコンテンツです。株式会社コナミデジタルエンタテインメントとは一切関係ありません。</li>
-        <li>遊戯王OCGおよび関連する画像・名称・データは、株式会社コナミデジタルエンタテインメントの著作物・商標です。</li>
-        <li>本サイトは非商用の個人制作ツールです。収益目的での運営・配布は行っておりません。</li>
-        <li>本サイトはリンクフリーとなっております。ご活用ください。</li>
-        <li>参照元：<a href="https://www.yugioh-card.com/en/genesys/" target="_blank">https://www.yugioh-card.com/en/genesys/</a></li>
+        <li>関連する画像・名称・データは株式会社コナミの著作物・商標です。</li>
+        <li>非商用の個人制作ツールです。収益目的ではありません。</li>
+        <li>リンクフリーです。ご活用ください。</li>
+        <li>参照元：<a href="https://www.yugioh-card.com/en/genesys/" target="_blank">公式サイト</a></li>
       </ul>
     </div>
     <div class="footer-menu">
@@ -160,11 +158,9 @@
       const tbodyMain = document.querySelector('#mainDeck tbody');
       const loadingDiv = document.getElementById('loadingMessage');
       const cidTextBlock = document.getElementById('cidTextBlock');
-      /* 沙月追加 ここから */
       const deckTotalPoint = document.getElementById('deckTotalPoint');
       deckTotalPoint.innerHTML = '';
       deckTotalPoint.style.color = '';
-      /* 沙月追加 ここまで */
       tbodyMain.innerHTML = '';
       cidTextBlock.textContent = '';
       loadingDiv.textContent = 'デッキ情報を取得しています…';
@@ -201,13 +197,12 @@
         return;
       }
 
-      const proxyUrl = "https://api.allorigins.win/get?url=" + encodeURIComponent(targetUrl);
+      const proxyUrl = "https://corsproxy.io/?url=" + encodeURIComponent(targetUrl);
 
       try {
         const res = await fetch(proxyUrl);
         if (!res.ok) throw new Error(`ステータスコード: ${res.status}`);
-        const data = await res.json();
-        const html = data.contents;
+        const html = await res.text();
 
         function extractDeck(htmlSection, tbody) {
           const rowBlocks = [...htmlSection.matchAll(/<tr class='[^']* row' title="([^"]+)">([\s\S]*?)<\/tr>/g)];
@@ -244,15 +239,18 @@
           const totalRow = document.createElement('tr');
           totalRow.innerHTML = `<td colspan="3"><strong>合計点数: ${totalScore}</strong></td>`;
           tbody.appendChild(totalRow);
-          deckTotalPoint.innerHTML = ` ${totalScore}点`; // 沙月追加しました
+          deckTotalPoint.innerHTML = ` ${totalScore}点`;
 
           if (totalScore > 100) {
             const warnRow = document.createElement('tr');
             warnRow.innerHTML = `<td colspan="3" class="warning">※デッキの点数が100を超えています！</td>`;
             tbody.appendChild(warnRow);
-            deckTotalPoint.style.color = '#f00'; // 沙月追加しました
+            deckTotalPoint.style.color = '#f00';
           }
+
+          cidTextBlock.textContent = cidNameList.join('\n');
         }
+
         extractDeck(html, tbodyMain);
         loadingDiv.textContent = '';
       } catch (err) {
