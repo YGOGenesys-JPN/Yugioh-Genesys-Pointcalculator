@@ -131,6 +131,7 @@
     <tbody></tbody>
   </table>
   
+  <div id="cidTextBlock"></div>
   <footer>
     <div class="footer-menu">
       <h3>権利・商標</h3>
@@ -155,6 +156,7 @@
       let targetUrl = document.getElementById('urlInput').value.trim();
       const tbodyMain = document.querySelector('#mainDeck tbody');
       const loadingDiv = document.getElementById('loadingMessage');
+      const cidTextBlock = document.getElementById('cidTextBlock');
       const deckTotalPoint = document.getElementById('deckTotalPoint');
       deckTotalPoint.innerHTML = '';
       deckTotalPoint.style.color = '';
