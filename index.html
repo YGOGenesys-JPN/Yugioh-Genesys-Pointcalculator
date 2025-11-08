@@ -1,263 +1,306 @@
 <!DOCTYPE html>
 <html lang="ja">
-<head>
-  <meta charset="UTF-8">
-  <title>遊戯王Genesys 点数計算ツール</title>
-  <style>
-    body {
-      font-family: sans-serif;
-      margin: 20px 20px 0;
-      background: #f0f0f0;
-      color: #333;
-      padding-bottom: 200px;
-    }
-    input {
-      font-size: 16px;
-      padding: 9px;
-      margin-bottom: 10px;
-    }
-    button {
-      margin-left: 10px;
-      background-color: #4070ff;
-      color: #fff;
-      border-color:  #4070ff;
-      font-size: 16px;
-      padding: 6px;
-      margin-bottom: 10px;
-    }
-    table {
-      width: stretch;
-      border-collapse: collapse;
-      background: #fff;
-      margin-bottom: 30px;
-    }
-    th, td {
-      border: 1px solid #ccc;
-      padding: 8px;
-      text-align: left;
-    }
-    th {
-      color: #1d3994;
-      background-color: #f1f5ff;
-    }
-    a {  
-      color: #1d3994;
-      text-decoration: none;
-      font-weight: bold;
-    }
-    #urlInput {
-      width: 300px;
-    }
-    .warning {
-      color: red;
-      font-weight: bold;
-    }
-    #usage {
-      background: #fff;
-      padding: 1em;
-      border: 1px solid #ccc;
-      margin-bottom: 2em;
-      width: stretch;
-    }
-    #usage p {
-      margin: 4px 0;
-    }
-    #usage h3 {
-      margin-top: 0;
-    }
-    #loadingMessage {
-      margin-bottom: 1em;
-      font-weight: bold;
-    }
-    footer {
-      background-color: #333;
-      color: whitesmoke;
-      padding: 8px 20px;
-      margin-left: -20px;
-      position: fixed;
-      bottom: 0;
-      width: stretch;
-    }
-    .footer-menu h3 {
-      font-size: 14px;
-      margin-top: 5px;
-      margin-bottom: 5px;
-    }
-    .footer-menu ul {
-      margin-top: 5px;
-      margin-bottom: 10px;
-    }
-    .footer-menu li {
-      font-size: 10px;
-    }
-    .footer-menu p {
-      margin: 0;
-      font-size: 10px;
-    }
-    footer a {
-      color: #27c;
-    }
-  </style>
-  <link rel="icon" href="favicon.ico">
-</head>
-<body>
-  <h2>遊戯王Genesys 点数計算ツール 2025/10/27版</h2>
-  <div id="usage">
-    <h3>使い方</h3>
-    <ul>
-      <li>遊戯王DBのデッキURLを入力し「点数を計算」ボタンを押すことで、デッキ内のカードの各点数と合計点数を表示できます。</li>
-      <li>当ツールで点数を確認したいデッキは「<span class="warning">公開</span>」状態である必要があります。</li>
-      <li>メインデッキとエクストラデッキのみ対応。サイドデッキは未対応です。</li>
-      <li>リンク・ペンデュラムモンスターは一部未対応です。</li>
-      <li>ニューロンアプリのURL（neuron.konami.net）は非対応。WEB版のURLをご利用ください。</li>
-      <li>情報取得に失敗した場合はリロードして再実行してください。</li>
-    </ul>
-    <p>点数表は<a href="scorelist.html" target="_blank">こちら</a></p>
-  </div>
-
-  <input type="text" id="urlInput" placeholder="URL 遊戯王ニューロン(WEB)" />
-  <button id="fetchBtn">点数を計算</button>
-  <div id="loadingMessage"></div>
-
-  <h3>デッキ合計点数<span id="deckTotalPoint"></span></h3>
-  <table id="mainDeck">
-    <thead>
-      <tr>
-        <th style="display:none">CID</th>
-        <th>カード名</th>
-        <th>点数</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
-  
-  <div id="cidTextBlock" style="display:none;"></div>
-  <footer>
-    <div class="footer-menu">
-      <h3>権利・商標</h3>
+  <head>
+    <meta charset="UTF-8" />
+    <title>遊戯王Genesys 点数計算ツール</title>
+    <style>
+      body {
+        font-family: sans-serif;
+        margin: 20px 20px 0;
+        background: #f0f0f0;
+        color: #333;
+        padding-bottom: 200px;
+      }
+      input {
+        font-size: 16px;
+        padding: 9px;
+        margin-bottom: 10px;
+      }
+      button {
+        margin-left: 10px;
+        background-color: #4070ff;
+        color: #fff;
+        border-color: #4070ff;
+        font-size: 16px;
+        padding: 6px;
+        margin-bottom: 10px;
+      }
+      table {
+        width: stretch;
+        border-collapse: collapse;
+        background: #fff;
+        margin-bottom: 30px;
+      }
+      th,
+      td {
+        border: 1px solid #ccc;
+        padding: 8px;
+        text-align: left;
+      }
+      th {
+        color: #1d3994;
+        background-color: #f1f5ff;
+      }
+      a {
+        color: #1d3994;
+        text-decoration: none;
+        font-weight: bold;
+      }
+      #urlInput {
+        width: 300px;
+      }
+      .warning {
+        color: red;
+        font-weight: bold;
+      }
+      #usage {
+        background: #fff;
+        padding: 1em;
+        border: 1px solid #ccc;
+        margin-bottom: 2em;
+        width: stretch;
+      }
+      #usage p {
+        margin: 4px 0;
+      }
+      #usage h3 {
+        margin-top: 0;
+      }
+      #loadingMessage {
+        margin-bottom: 1em;
+        font-weight: bold;
+      }
+      footer {
+        background-color: #333;
+        color: whitesmoke;
+        padding: 8px 20px;
+        margin-left: -20px;
+        position: fixed;
+        bottom: 0;
+        width: stretch;
+      }
+      .footer-menu h3 {
+        font-size: 14px;
+        margin-top: 5px;
+        margin-bottom: 5px;
+      }
+      .footer-menu ul {
+        margin-top: 5px;
+        margin-bottom: 10px;
+      }
+      .footer-menu li {
+        font-size: 10px;
+      }
+      .footer-menu p {
+        margin: 0;
+        font-size: 10px;
+      }
+      footer a {
+        color: #27c;
+      }
+    </style>
+    <link rel="icon" href="favicon.ico" />
+  </head>
+  <body>
+    <h2>遊戯王Genesys 点数計算ツール 2025/10/27版</h2>
+    <div id="usage">
+      <h3>使い方</h3>
       <ul>
-        <li>このサイトは遊戯王OCGの非公式ファンコンテンツです。株式会社コナミデジタルエンタテインメントとは一切関係ありません。</li>
-        <li>関連する画像・名称・データは株式会社コナミの著作物・商標です。</li>
-        <li>非商用の個人制作ツールです。収益目的ではありません。</li>
-        <li>リンクフリーです。ご活用ください。</li>
-        <li>参照元：<a href="https://www.yugioh-card.com/en/genesys/" target="_blank">公式サイト</a></li>
+        <li>
+          遊戯王DBのデッキURLを入力し「点数を計算」ボタンを押すことで、デッキ内のカードの各点数と合計点数を表示できます。
+        </li>
+        <li>
+          当ツールで点数を確認したいデッキは「<span class="warning">公開</span
+          >」状態である必要があります。
+        </li>
+        <li>
+          メインデッキとエクストラデッキのみ対応。サイドデッキは未対応です。
+        </li>
+        <li>リンク・ペンデュラムモンスターは一部未対応です。</li>
+        <li>
+          ニューロンアプリのURL（neuron.konami.net）は非対応。WEB版のURLをご利用ください。
+        </li>
+        <li>情報取得に失敗した場合はリロードして再実行してください。</li>
       </ul>
+      <p>点数表は<a href="scorelist.html" target="_blank">こちら</a></p>
     </div>
-    <div class="footer-menu">
-      <h3>当サイトについて</h3>
-      <p>お問い合わせ:<a href="https://x.com/rusesaaaaaaaaan/" target="_blank">X:@Rusesaaaaaaaaan</a></p>
-      <p>最終更新日:2025/11/2</p>
-      <p>© 2025 <a href="https://x.com/rusesaaaaaaaaan/" target="_blank">@Rusesaaaaaaaaan</a></p>
-    </div>
-  </footer>
 
-  <script>
-    document.getElementById('fetchBtn').addEventListener('click', async () => {
-      let targetUrl = document.getElementById('urlInput').value.trim();
-      const tbodyMain = document.querySelector('#mainDeck tbody');
-      const loadingDiv = document.getElementById('loadingMessage');
-      const cidTextBlock = document.getElementById('cidTextBlock');
-      const deckTotalPoint = document.getElementById('deckTotalPoint');
-      deckTotalPoint.innerHTML = '';
-      deckTotalPoint.style.color = '';
-      tbodyMain.innerHTML = '';
-      cidTextBlock.textContent = '';
-      loadingDiv.textContent = 'デッキ情報を取得しています…';
+    <input type="text" id="urlInput" placeholder="URL 遊戯王ニューロン(WEB)" />
+    <button id="fetchBtn">点数を計算</button>
+    <div id="loadingMessage"></div>
 
-      if (!targetUrl) {
-        alert('URLを入力してください');
-        loadingDiv.textContent = '';
-        return;
-      }
+    <h3>デッキ合計点数<span id="deckTotalPoint"></span></h3>
+    <table id="mainDeck">
+      <thead>
+        <tr>
+          <th style="display: none">CID</th>
+          <th>カード名</th>
+          <th>点数</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
 
-      if (/ytkn=|ope=|wname=/.test(targetUrl)) {
-        const cgidMatch = targetUrl.match(/cgid=([a-zA-Z0-9]+)/);
-        const dnoMatch = targetUrl.match(/dno=(\d+)/);
-        if (cgidMatch && dnoMatch) {
-          const cgid = cgidMatch[1];
-          const dno = dnoMatch[1];
-          targetUrl = `https://www.db.yugioh-card.com/yugiohdb/member_deck.action?cgid=${cgid}&dno=${dno}&request_locale=ja`;
-        } else {
-          alert('cgid または dno が見つかりません。URLを確認してください。');
-          loadingDiv.textContent = '';
-          return;
-        }
-      }
+    <div id="cidTextBlock" style="display: none"></div>
+    <footer>
+      <div class="footer-menu">
+        <h3>権利・商標</h3>
+        <ul>
+          <li>
+            このサイトは遊戯王OCGの非公式ファンコンテンツです。株式会社コナミデジタルエンタテインメントとは一切関係ありません。
+          </li>
+          <li>
+            関連する画像・名称・データは株式会社コナミの著作物・商標です。
+          </li>
+          <li>非商用の個人制作ツールです。収益目的ではありません。</li>
+          <li>リンクフリーです。ご活用ください。</li>
+          <li>
+            参照元：<a
+              href="https://www.yugioh-card.com/en/genesys/"
+              target="_blank"
+              >公式サイト</a
+            >
+          </li>
+        </ul>
+      </div>
+      <div class="footer-menu">
+        <h3>当サイトについて</h3>
+        <p>
+          お問い合わせ:<a href="https://x.com/rusesaaaaaaaaan/" target="_blank"
+            >X:@Rusesaaaaaaaaan</a
+          >
+        </p>
+        <p>最終更新日:2025/11/2</p>
+        <p>
+          © 2025
+          <a href="https://x.com/rusesaaaaaaaaan/" target="_blank"
+            >@Rusesaaaaaaaaan</a
+          >
+        </p>
+      </div>
+    </footer>
 
-      let cardMap = {};
-      try {
-        const cardRes = await fetch('cards.json');
-        if (!cardRes.ok) throw new Error('cards.jsonの読み込みに失敗しました');
-        cardMap = await cardRes.json();
-      } catch (err) {
-        alert('cards.jsonの読み込みに失敗しました。');
-        console.error(err);
-        loadingDiv.textContent = '';
-        return;
-      }
+    <script>
+      document
+        .getElementById("fetchBtn")
+        .addEventListener("click", async () => {
+          let targetUrl = document.getElementById("urlInput").value.trim();
+          const tbodyMain = document.querySelector("#mainDeck tbody");
+          const loadingDiv = document.getElementById("loadingMessage");
+          const cidTextBlock = document.getElementById("cidTextBlock");
+          const deckTotalPoint = document.getElementById("deckTotalPoint");
+          deckTotalPoint.innerHTML = "";
+          deckTotalPoint.style.color = "";
+          tbodyMain.innerHTML = "";
+          cidTextBlock.textContent = "";
+          loadingDiv.textContent = "デッキ情報を取得しています…";
 
-      const proxyUrl = "https://corsproxy.io/?url=" + encodeURIComponent(targetUrl);
+          if (!targetUrl) {
+            alert("URLを入力してください");
+            loadingDiv.textContent = "";
+            return;
+          }
 
-      try {
-        const res = await fetch(proxyUrl);
-        if (!res.ok) throw new Error(`ステータスコード: ${res.status}`);
-        const html = await res.text();
+          if (/ytkn=|ope=|wname=/.test(targetUrl)) {
+            const cgidMatch = targetUrl.match(/cgid=([a-zA-Z0-9]+)/);
+            const dnoMatch = targetUrl.match(/dno=(\d+)/);
+            if (cgidMatch && dnoMatch) {
+              const cgid = cgidMatch[1];
+              const dno = dnoMatch[1];
+              targetUrl = `https://www.db.yugioh-card.com/yugiohdb/member_deck.action?cgid=${cgid}&dno=${dno}&request_locale=ja`;
+            } else {
+              alert(
+                "cgid または dno が見つかりません。URLを確認してください。"
+              );
+              loadingDiv.textContent = "";
+              return;
+            }
+          }
 
-        function extractDeck(htmlSection, tbody) {
-          const rowBlocks = [...htmlSection.matchAll(/<tr class='[^']* row' title="([^"]+)">([\s\S]*?)<\/tr>/g)];
-          let totalScore = 0;
-          let cidNameList = [];
+          let cardMap = {};
+          try {
+            const cardRes = await fetch("cards.json");
+            if (!cardRes.ok)
+              throw new Error("cards.jsonの読み込みに失敗しました");
+            cardMap = await cardRes.json();
+          } catch (err) {
+            alert("cards.jsonの読み込みに失敗しました。");
+            console.error(err);
+            loadingDiv.textContent = "";
+            return;
+          }
 
-          for (const block of rowBlocks) {
-            let cardName = block[1];
-            const inner = block[2];
+          const proxyUrl =
+            "https://corsproxy.io/?url=" + encodeURIComponent(targetUrl);
 
-            const cidMatch = inner.match(/value="[^"]*cid=(\d+)&/);
-            const countMatch = inner.match(/<td class="num">\s*<span>(\d+)<\/span>/);
+          try {
+            const res = await fetch(proxyUrl);
+            if (!res.ok) throw new Error(`ステータスコード: ${res.status}`);
+            const html = await res.text();
 
-            if (cidMatch && countMatch) {
-              const cid = cidMatch[1];
-              const count = parseInt(countMatch[1]);
-              cardName = cardName.replace(/【(禁止|制限|準制限)カード】/g, '').trim();
-              const score = cardMap[cid]?.score ?? 0;
+            function extractDeck(htmlSection, tbody) {
+              const rowBlocks = [
+                ...htmlSection.matchAll(
+                  /<tr class='[^']* row' title="([^"]+)">([\s\S]*?)<\/tr>/g
+                ),
+              ];
+              let totalScore = 0;
+              let cidNameList = [];
 
-              for (let i = 0; i < count; i++) {
-                totalScore += score;
-                const row = document.createElement('tr');
-                row.innerHTML = `
+              for (const block of rowBlocks) {
+                let cardName = block[1];
+                const inner = block[2];
+
+                const cidMatch = inner.match(/value="[^"]*cid=(\d+)&/);
+                const countMatch = inner.match(
+                  /<td class="num">\s*<span>(\d+)<\/span>/
+                );
+
+                if (cidMatch && countMatch) {
+                  const cid = cidMatch[1];
+                  const count = parseInt(countMatch[1]);
+                  cardName = cardName
+                    .replace(/【(禁止|制限|準制限)カード】/g, "")
+                    .trim();
+                  const score = cardMap[cid]?.score ?? 0;
+
+                  for (let i = 0; i < count; i++) {
+                    totalScore += score;
+                    const row = document.createElement("tr");
+                    row.innerHTML = `
                   <td style="display:none">${cid}</td>
                   <td>${cardName}</td>
                   <td>${score}</td>
                 `;
-                tbody.appendChild(row);
-                cidNameList.push(`${cid},${cardName}`);
+                    tbody.appendChild(row);
+                    cidNameList.push(`${cid},${cardName}`);
+                  }
+                }
               }
+
+              const totalRow = document.createElement("tr");
+              totalRow.innerHTML = `<td colspan="3"><strong>合計点数: ${totalScore}</strong></td>`;
+              tbody.appendChild(totalRow);
+              deckTotalPoint.innerHTML = ` ${totalScore}点`;
+
+              if (totalScore > 100) {
+                const warnRow = document.createElement("tr");
+                warnRow.innerHTML = `<td colspan="3" class="warning">※デッキの点数が100を超えています！</td>`;
+                tbody.appendChild(warnRow);
+                deckTotalPoint.style.color = "#f00";
+              }
+
+              cidTextBlock.textContent = cidNameList.join("\n");
             }
+
+            extractDeck(html, tbodyMain);
+            loadingDiv.textContent = "";
+          } catch (err) {
+            alert("HTMLの取得に失敗しました。再度実行をお願いします。");
+            console.error("取得エラー:", err);
+            loadingDiv.textContent = "";
           }
-
-          const totalRow = document.createElement('tr');
-          totalRow.innerHTML = `<td colspan="3"><strong>合計点数: ${totalScore}</strong></td>`;
-          tbody.appendChild(totalRow);
-          deckTotalPoint.innerHTML = ` ${totalScore}点`;
-
-          if (totalScore > 100) {
-            const warnRow = document.createElement('tr');
-            warnRow.innerHTML = `<td colspan="3" class="warning">※デッキの点数が100を超えています！</td>`;
-            tbody.appendChild(warnRow);
-            deckTotalPoint.style.color = '#f00';
-          }
-
-          cidTextBlock.textContent = cidNameList.join('\n');
-        }
-
-        extractDeck(html, tbodyMain);
-        loadingDiv.textContent = '';
-      } catch (err) {
-        alert('HTMLの取得に失敗しました。再度実行をお願いします。');
-        console.error('取得エラー:', err);
-        loadingDiv.textContent = '';
-      }
-    });
-  </script>
-</body>
+        });
+    </script>
+  </body>
 </html>

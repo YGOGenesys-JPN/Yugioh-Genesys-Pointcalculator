@@ -1,159 +1,173 @@
 <!DOCTYPE html>
 <html lang="ja">
-<head>
-  <meta charset="UTF-8">
-  <title>遊戯王Genesys点数表(日本語) 2025/10/27版</title>
-  <style>
-    body {
-      font-family: sans-serif;
-      margin: 20px;
-      background: #f0f0f0;
-      color: #333;
-    }
-    input {
-      font-size: 16px;
-      padding: 9px;
-      margin-bottom: 10px;
-    }
-    button {
-      margin-left: 10px;
-      background-color: #4070ff;
-      color: #fff;
-      border-color:  #4070ff;
-      font-size: 16px;
-      padding: 6px;
-      margin-bottom: 10px;
-    }
-    table {
-      border-collapse: collapse;
-      width: stretch;
-      background: #fff;
-      margin-bottom: 2em;
-    }
-    th, td {
-      border: 1px solid #ccc;
-      padding: 8px;
-      text-align: left;
-    }
-    th {
-      color: #1d3994;
-      background-color: #f1f5ff;
-    }
-    /* indexとここまで共通 */
-    a {  
-      color: #27c;
-      text-decoration: none;
-      font-weight: bold;
-    }
-    #sortToggleBtn {
-      width: 160px;
-    }
-    #clearBtn {
-      background-color: #666;
-      border-color:  #666;
-      width: 120px;
-    }
-    #filterInput {
-      width: 300px;
-    }
-    #scoreInput {
-      width: 150px;
-      margin-left: 10px;
-    }
-    #sortStatus {
-      margin-bottom: 10px;
-      font-weight: bold;
-    }
-  </style>
-  <link rel="icon" href="favicon.ico">
-</head>
-<body>
-  <h1>遊戯王Genesys点数表(日本語) 2025/10/27版</h1>
+  <head>
+    <meta charset="UTF-8" />
+    <title>遊戯王Genesys点数表(日本語) 2025/10/27版</title>
+    <style>
+      body {
+        font-family: sans-serif;
+        margin: 20px;
+        background: #f0f0f0;
+        color: #333;
+      }
+      input {
+        font-size: 16px;
+        padding: 9px;
+        margin-bottom: 10px;
+      }
+      button {
+        margin-left: 10px;
+        background-color: #4070ff;
+        color: #fff;
+        border-color: #4070ff;
+        font-size: 16px;
+        padding: 6px;
+        margin-bottom: 10px;
+      }
+      table {
+        border-collapse: collapse;
+        width: stretch;
+        background: #fff;
+        margin-bottom: 2em;
+      }
+      th,
+      td {
+        border: 1px solid #ccc;
+        padding: 8px;
+        text-align: left;
+      }
+      th {
+        color: #1d3994;
+        background-color: #f1f5ff;
+      }
+      /* indexとここまで共通 */
+      a {
+        color: #27c;
+        text-decoration: none;
+        font-weight: bold;
+      }
+      #sortToggleBtn {
+        width: 160px;
+      }
+      #clearBtn {
+        background-color: #666;
+        border-color: #666;
+        width: 120px;
+      }
+      #filterInput {
+        width: 300px;
+      }
+      #scoreInput {
+        width: 150px;
+        margin-left: 10px;
+      }
+      #sortStatus {
+        margin-bottom: 10px;
+        font-weight: bold;
+      }
+    </style>
+    <link rel="icon" href="favicon.ico" />
+  </head>
+  <body>
+    <h1>遊戯王Genesys点数表(日本語) 2025/10/27版</h1>
 
-  <input type="text" id="filterInput" placeholder="カード名で検索...">
-  <input type="number" id="scoreInput" placeholder="点数で検索..." min="0">
-  <button id="sortToggleBtn">点数で昇順に並べる</button>
-  <button id="clearBtn">検索クリア</button>
+    <input type="text" id="filterInput" placeholder="カード名で検索..." />
+    <input type="number" id="scoreInput" placeholder="点数で検索..." min="0" />
+    <button id="sortToggleBtn">点数で昇順に並べる</button>
+    <button id="clearBtn">検索クリア</button>
 
-  <div id="sortStatus">現在の並び順：Unicode順</div>
+    <div id="sortStatus">現在の並び順：Unicode順</div>
 
-  <table id="scoreTable">
-    <thead>
-      <tr><th>カード名</th><th>点数</th></tr>
-    </thead>
-    <tbody id="tableBody">
-      <!-- JavaScriptで挿入される -->
-    </tbody>
-  </table>
-  <p>デッキリストからの点数計算は<a href="index.html" target="_blank">こちら</a></p>
-  <script>
-    let cardData = {};
-    const tableBody = document.getElementById('tableBody');
-    const sortStatus = document.getElementById('sortStatus');
-    const sortToggleBtn = document.getElementById('sortToggleBtn');
-    const filterInput = document.getElementById('filterInput');
-    const scoreInput = document.getElementById('scoreInput');
-    const clearBtn = document.getElementById('clearBtn');
-    let sortByScore = false;
+    <table id="scoreTable">
+      <thead>
+        <tr>
+          <th>カード名</th>
+          <th>点数</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody">
+        <!-- JavaScriptで挿入される -->
+      </tbody>
+    </table>
+    <p>
+      デッキリストからの点数計算は<a href="index.html" target="_blank"
+        >こちら</a
+      >
+    </p>
+    <script>
+      let cardData = {};
+      const tableBody = document.getElementById("tableBody");
+      const sortStatus = document.getElementById("sortStatus");
+      const sortToggleBtn = document.getElementById("sortToggleBtn");
+      const filterInput = document.getElementById("filterInput");
+      const scoreInput = document.getElementById("scoreInput");
+      const clearBtn = document.getElementById("clearBtn");
+      let sortByScore = false;
 
-    function renderTable(nameFilter = '', scoreFilter = '') {
-      tableBody.innerHTML = '';
-      let entries = Object.entries(cardData);
+      function renderTable(nameFilter = "", scoreFilter = "") {
+        tableBody.innerHTML = "";
+        let entries = Object.entries(cardData);
 
-      entries = entries.filter(([cid, info]) => {
-        const nameMatch = info.name.includes(nameFilter);
-        const scoreMatch = scoreFilter === '' || info.score === Number(scoreFilter);
-        return nameMatch && scoreMatch;
-      });
+        entries = entries.filter(([cid, info]) => {
+          const nameMatch = info.name.includes(nameFilter);
+          const scoreMatch =
+            scoreFilter === "" || info.score === Number(scoreFilter);
+          return nameMatch && scoreMatch;
+        });
 
-      if (sortByScore) {
-        entries.sort((a, b) => a[1].score - b[1].score);
-      } else {
-        entries.sort((a, b) => a[1].name.localeCompare(b[1].name, 'ja'));
+        if (sortByScore) {
+          entries.sort((a, b) => a[1].score - b[1].score);
+        } else {
+          entries.sort((a, b) => a[1].name.localeCompare(b[1].name, "ja"));
+        }
+
+        entries.forEach(([cid, info]) => {
+          const row = `<tr><td>${info.name}</td><td>${info.score}</td></tr>`;
+          tableBody.innerHTML += row;
+        });
       }
 
-      entries.forEach(([cid, info]) => {
-        const row = `<tr><td>${info.name}</td><td>${info.score}</td></tr>`;
-        tableBody.innerHTML += row;
+      filterInput.addEventListener("input", function () {
+        renderTable(filterInput.value.trim(), scoreInput.value.trim());
       });
-    }
 
-    filterInput.addEventListener('input', function() {
-      renderTable(filterInput.value.trim(), scoreInput.value.trim());
-    });
+      scoreInput.addEventListener("input", function () {
+        renderTable(filterInput.value.trim(), scoreInput.value.trim());
+      });
 
-    scoreInput.addEventListener('input', function() {
-      renderTable(filterInput.value.trim(), scoreInput.value.trim());
-    });
+      sortToggleBtn.addEventListener("click", function () {
+        sortByScore = !sortByScore;
+        sortStatus.textContent = sortByScore
+          ? "現在の並び順：点数昇順"
+          : "現在の並び順：Unicode順";
+        sortToggleBtn.textContent = sortByScore
+          ? "Unicode順に並べる"
+          : "点数で昇順に並べる";
+        renderTable(filterInput.value.trim(), scoreInput.value.trim());
+      });
 
-    sortToggleBtn.addEventListener('click', function() {
-      sortByScore = !sortByScore;
-      sortStatus.textContent = sortByScore ? '現在の並び順：点数昇順' : '現在の並び順：Unicode順';
-      sortToggleBtn.textContent = sortByScore ? 'Unicode順に並べる' : '点数で昇順に並べる';
-      renderTable(filterInput.value.trim(), scoreInput.value.trim());
-    });
-
-    clearBtn.addEventListener('click', function() {
-      filterInput.value = '';
-      scoreInput.value = '';
-      renderTable();
-    });
-
-    async function loadCardData() {
-      try {
-        const res = await fetch('cards.json');
-        if (!res.ok) throw new Error('cards.jsonの読み込みに失敗しました');
-        cardData = await res.json();
+      clearBtn.addEventListener("click", function () {
+        filterInput.value = "";
+        scoreInput.value = "";
         renderTable();
-      } catch (err) {
-        console.error('cards.jsonの読み込みエラー:', err);
-        tableBody.innerHTML = '<tr><td colspan="2">cards.jsonの読み込みに失敗しました</td></tr>';
-      }
-    }
+      });
 
-    sortStatus.textContent = '現在の並び順：Unicode順';
-    sortToggleBtn.textContent = '点数で昇順に並べる';
-    loadCardData();
-  </script>
-</body>
+      async function loadCardData() {
+        try {
+          const res = await fetch("cards.json");
+          if (!res.ok) throw new Error("cards.jsonの読み込みに失敗しました");
+          cardData = await res.json();
+          renderTable();
+        } catch (err) {
+          console.error("cards.jsonの読み込みエラー:", err);
+          tableBody.innerHTML =
+            '<tr><td colspan="2">cards.jsonの読み込みに失敗しました</td></tr>';
+        }
+      }
+
+      sortStatus.textContent = "現在の並び順：Unicode順";
+      sortToggleBtn.textContent = "点数で昇順に並べる";
+      loadCardData();
+    </script>
+  </body>
 </html>

@@ -1,110 +1,120 @@
 <!DOCTYPE html>
 <html lang="ja">
-<head>
-  <meta charset="UTF-8">
-  <title>CIDリンク生成ツール</title>
-  <style>
-    body {
-      font-family: sans-serif;
-      margin: 20px;
-      background: #f9f9f9;
-    }
-    input, button {
-      font-size: 16px;
-      padding: 8px;
-      margin-bottom: 10px;
-    }
-    input {
-      width: 400px;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      background: #fff;
-      margin-top: 1em;
-    }
-    th, td {
-      border: 1px solid #ccc;
-      padding: 8px;
-    }
-    th {
-      background: #eee;
-    }
-    #loading {
-      font-weight: bold;
-      margin-top: 10px;
-    }
-  </style>
-  <link rel="icon" href="favicon.ico">
-</head>
-<body>
-  <h2>CIDリンク生成ツール</h2>
-  <p>カンマ区切りでCIDを入力してください（例：21349,12345,67890）</p>
-  <input type="text" id="cidInput" placeholder="CIDを入力" />
-  <button id="generateBtn">リンク生成</button>
-  <div id="loading"></div>
-
-  <table id="resultTable">
-    <thead>
-      <tr>
-        <th>CID</th>
-        <th>URL</th>
-        <th>カード名（ページタイトル）</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
-
-  <script>
-    document.getElementById('generateBtn').addEventListener('click', async () => {
-      const input = document.getElementById('cidInput').value.trim();
-      const loading = document.getElementById('loading');
-      const tbody = document.querySelector('#resultTable tbody');
-      tbody.innerHTML = '';
-      loading.textContent = '取得中…';
-
-      if (!input) {
-        alert('CIDを入力してください');
-        loading.textContent = '';
-        return;
+  <head>
+    <meta charset="UTF-8" />
+    <title>CIDリンク生成ツール</title>
+    <style>
+      body {
+        font-family: sans-serif;
+        margin: 20px;
+        background: #f9f9f9;
       }
+      input,
+      button {
+        font-size: 16px;
+        padding: 8px;
+        margin-bottom: 10px;
+      }
+      input {
+        width: 400px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        background: #fff;
+        margin-top: 1em;
+      }
+      th,
+      td {
+        border: 1px solid #ccc;
+        padding: 8px;
+      }
+      th {
+        background: #eee;
+      }
+      #loading {
+        font-weight: bold;
+        margin-top: 10px;
+      }
+    </style>
+    <link rel="icon" href="favicon.ico" />
+  </head>
+  <body>
+    <h2>CIDリンク生成ツール</h2>
+    <p>カンマ区切りでCIDを入力してください（例：21349,12345,67890）</p>
+    <input type="text" id="cidInput" placeholder="CIDを入力" />
+    <button id="generateBtn">リンク生成</button>
+    <div id="loading"></div>
 
-      const cidList = input.split(',').map(cid => cid.trim()).filter(cid => /^\d+$/.test(cid));
-      for (const cid of cidList) {
-        const url = `https://www.db.yugioh-card.com/yugiohdb/card_search.action?ope=2&cid=${cid}&request_locale=ja`;
+    <table id="resultTable">
+      <thead>
+        <tr>
+          <th>CID</th>
+          <th>URL</th>
+          <th>カード名（ページタイトル）</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
 
-        try {
-          const proxyUrl = "https://api.allorigins.win/get?url=" + encodeURIComponent(url);
-          const res = await fetch(proxyUrl);
-          if (!res.ok) throw new Error(`CID ${cid} の取得失敗`);
-          const data = await res.json();
-          const html = data.contents;
+    <script>
+      document
+        .getElementById("generateBtn")
+        .addEventListener("click", async () => {
+          const input = document.getElementById("cidInput").value.trim();
+          const loading = document.getElementById("loading");
+          const tbody = document.querySelector("#resultTable tbody");
+          tbody.innerHTML = "";
+          loading.textContent = "取得中…";
 
-          const titleMatch = html.match(/<title>(.*?)<\/title>/);
-          const fullTitle = titleMatch ? titleMatch[1].trim() : 'タイトル取得失敗';
-          const cardName = fullTitle.split('|')[0].trim(); // 最初の「|」の前をカード名とする
+          if (!input) {
+            alert("CIDを入力してください");
+            loading.textContent = "";
+            return;
+          }
 
-          const row = document.createElement('tr');
-          row.innerHTML = `
+          const cidList = input
+            .split(",")
+            .map((cid) => cid.trim())
+            .filter((cid) => /^\d+$/.test(cid));
+          for (const cid of cidList) {
+            const url = `https://www.db.yugioh-card.com/yugiohdb/card_search.action?ope=2&cid=${cid}&request_locale=ja`;
+
+            try {
+              const proxyUrl =
+                "https://api.allorigins.win/get?url=" + encodeURIComponent(url);
+              const res = await fetch(proxyUrl);
+              if (!res.ok) throw new Error(`CID ${cid} の取得失敗`);
+              const data = await res.json();
+              const html = data.contents;
+
+              const titleMatch = html.match(/<title>(.*?)<\/title>/);
+              const fullTitle = titleMatch
+                ? titleMatch[1].trim()
+                : "タイトル取得失敗";
+              const cardName = fullTitle.split("|")[0].trim(); // 最初の「|」の前をカード名とする
+
+              const row = document.createElement("tr");
+              row.innerHTML = `
             <td>${cid}</td>
             <td><a href="${url}" target="_blank">${url}</a></td>
             <td>${cardName}</td>
           `;
-          tbody.appendChild(row);
-        } catch (err) {
-          console.error(err);
-          const row = document.createElement('tr');
-          row.innerHTML = `
+              tbody.appendChild(row);
+            } catch (err) {
+              console.error(err);
+              const row = document.createElement("tr");
+              row.innerHTML = `
             <td>${cid}</td>
             <td><a href="${url}" target="_blank">${url}</a></td>
             <td>取得失敗</td>
           `;
-          tbody.appendChild(row);
-        }
-      }
+              tbody.appendChild(row);
+            }
+          }
 
-      loading.textContent = '';
-    });
-  </script>
-</body>
+          loading.textContent = "";
+        });
+    </script>
+  </body>
 </html>
