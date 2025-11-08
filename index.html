@@ -17,12 +17,15 @@
         margin-bottom: 10px;
       }
       button {
-        margin-left: 10px;
         background-color: #4070ff;
         color: #fff;
         border-color: #4070ff;
         font-size: 16px;
         padding: 6px;
+        cursor: pointer;
+      }
+      #fetchBtn {
+        margin-left: 10px;
         margin-bottom: 10px;
       }
       table {
@@ -71,13 +74,38 @@
         font-weight: bold;
       }
       footer {
-        background-color: #333;
-        color: whitesmoke;
-        padding: 8px 20px;
-        margin-left: -20px;
         position: fixed;
         bottom: 0;
         width: stretch;
+        background-color: #333;
+        color: whitesmoke;
+        z-index: 9999;
+        padding: 8px 20px;
+        margin-left: -20px;
+      }
+      .collapsed {
+        height: 0 !important;
+        padding: 0 !important;
+      }
+      #footer-toggle {
+        position: absolute;
+        top: -30px;
+        left: 50%;
+        transform: translateX(-50%);
+        border: none;
+        background-color: #333;
+        color: whitesmoke;
+        cursor: pointer;
+        border-top-left-radius: 5px;
+        border-top-right-radius: 5px;
+        z-index: 10000;
+        outline: none;
+        font-weight: bold;
+        padding: 5px 10px;
+      }
+      #toggle-icon {
+        font-size: 16px;
+        padding: 5px 10px;
       }
       .footer-menu h3 {
         font-size: 14px;
@@ -142,7 +170,10 @@
     </table>
 
     <div id="cidTextBlock" style="display: none"></div>
-    <footer>
+    <footer id="footer">
+      <button id="footer-toggle" aria-expanded="true">
+        <span id="toggle-icon">∨</span>
+      </button>
       <div class="footer-menu">
         <h3>権利・商標</h3>
         <ul>
@@ -301,6 +332,41 @@
             loadingDiv.textContent = "";
           }
         });
+      /*フッター処理用関数*/
+      // JavaScriptファイルの末尾に追加
+      document.addEventListener("DOMContentLoaded", () => {
+        const footer = document.getElementById("footer");
+        const toggleButton = document.getElementById("footer-toggle");
+        const toggleIcon = document.getElementById("toggle-icon");
+
+        if (!footer || !toggleButton || !toggleIcon) {
+          console.error(
+            "フッター要素が見つかりません。IDが正しいか確認してください。"
+          );
+          return;
+        }
+
+        // トグルボタンがクリックされた時の処理
+        toggleButton.addEventListener("click", () => {
+          // 1. フッターに .collapsed クラスをトグル（追加・削除）する
+          footer.classList.toggle("collapsed");
+
+          // 2. アイコン（∨/∧）とARIA属性を切り替える
+          const isCollapsed = footer.classList.contains("collapsed");
+
+          if (isCollapsed) {
+            // 折りたたむ時：アイコンを「∧」、aria-expandedを「false」に
+            toggleIcon.textContent = "∧";
+            toggleButton.setAttribute("aria-expanded", "false");
+            toggleButton.setAttribute("title", "フッターを開く");
+          } else {
+            // 開く時：アイコンを「∨」、aria-expandedを「true」に
+            toggleIcon.textContent = "∨";
+            toggleButton.setAttribute("aria-expanded", "true");
+            toggleButton.setAttribute("title", "フッターを折りたたむ");
+          }
+        });
+      });
     </script>
   </body>
 </html>
