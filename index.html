@@ -126,11 +126,28 @@
       footer a {
         color: #27c;
       }
+      .pagetop-link {
+        position: absolute;
+        top: -35px;
+        left: 90%;
+        transform: translateX(-50%);
+        border: none;
+        background-color: #777;
+        color: #ddd;
+        cursor: pointer;
+        border-radius: 5px;
+        z-index: 10000;
+        outline: none;
+        font-weight: bold;
+        padding: 0 10px 4px;
+        text-decoration: none;
+        white-space: nowrap;
+      }
     </style>
     <link rel="icon" href="favicon.ico" />
   </head>
   <body>
-    <h2>遊戯王Genesys 点数計算ツール 2025/10/27版</h2>
+    <h2 id="pagetop">遊戯王Genesys 点数計算ツール 2025/10/27版</h2>
     <div id="usage">
       <h3>使い方</h3>
       <ul>
@@ -174,6 +191,7 @@
       <button id="footer-toggle" aria-expanded="true">
         <span id="toggle-icon">∨</span>
       </button>
+      <a href="#pagetop" class="pagetop-link">Page TOP へ</a>
       <div class="footer-menu">
         <h3>権利・商標</h3>
         <ul>
